@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Bank.Domain.Models;
-using Bank.DataAccess.Configurations;
+using Bank.Infrastructure.Configurations;
 
-namespace Bank.DataAccess.Context
+namespace Bank.Infrastructure.Context
 {
     public class BankDbContext: DbContext
     {
@@ -39,4 +39,4 @@ namespace Bank.DataAccess.Context
         }
     }
 }
-}
+

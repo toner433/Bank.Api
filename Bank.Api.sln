@@ -4,10 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.14.36616.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank_dbo", "Bank_dbo\Bank_dbo.csproj", "{A4C2F791-8E32-49E3-A9BB-1A8A8F198D87}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9573AFAC-9ABC-41D9-8337-C387229CD746} = {9573AFAC-9ABC-41D9-8337-C387229CD746}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Domain", "Bank.Domain\Bank.Domain.csproj", "{E06B603B-7206-427C-ABAD-5F80F058BE5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.DataAccess", "Bank.DataAccess\Bank.DataAccess.csproj", "{9573AFAC-9ABC-41D9-8337-C387229CD746}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Infrastructure", "Bank.Infrastructure\Bank.Infrastructure.csproj", "{9573AFAC-9ABC-41D9-8337-C387229CD746}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Application", "Bank.Application\Bank.Application.csproj", "{81634794-063E-4CF0-8795-629B1C9B6FEB}"
 EndProject

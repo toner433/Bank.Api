@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Bank.Domain.Models;
 
-namespace Bank.DataAccess.Configurations
+namespace Bank.Infrastructure.Configurations
 {
     public class SessionConfiguration : IEntityTypeConfiguration<Session>
     {
