@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace Bank.Domain.Interfaces
 {
-    public interface ICardRepository
+    public interface ICardRepository : IRepository<Card>
     {
-        Task<Card?> GetByIdAsync(Guid id);
         Task<List<Card>> GetByAccountIdAsync(Guid accountId);
         Task<List<Card>> GetByUserIdAsync(Guid userId);
-        Task AddAsync(Card card);
-        Task UpdateAsync(Card card);
-        Task DeleteByIdAsync(Guid id);
+        Task<Card?> GetByCardNumberAsync(string cardNumber);
+       
+        Task<CardOperation?> GetOperationByIdAsync(Guid id);
+        Task<List<CardOperation>> GetOperationsByCardIdAsync(Guid cardId);
+        Task AddOperationAsync(CardOperation operation);
     }
 }

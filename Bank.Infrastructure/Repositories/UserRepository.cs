@@ -10,18 +10,10 @@ using System.Threading.Tasks;
 
 namespace Bank.Infrastructure.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
-        private readonly BankDbContext _context;
-
-        public UserRepository(BankDbContext context)
+        public UserRepository(BankDbContext context) : base(context)
         {
-            _context = context;
-        }
-
-        public async Task<User?> GetByIdAsync(Guid id)
-        {
-            return await _context.Users.FindAsync(id);
         }
 
         public async Task<User?> GetByLoginAsync(string login)
@@ -30,21 +22,10 @@ namespace Bank.Infrastructure.Repositories
                 .FirstOrDefaultAsync(u => u.Login == login);
         }
 
-        public async Task AddAsync(User user)
-        {
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(User user)
-        {
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task<bool> ExistsAsync(string login)
         {
-            return await _context.Users.AnyAsync(u => u.Login == login);
+            return await _context.Users
+                .AnyAsync(u => u.Login == login);
         }
     }
 }

@@ -9,8 +9,6 @@ namespace Bank.Domain.Interfaces
 {
     public interface IOperationTypeRepository
     {
-        Task<OperationType?> GetByIdAsync(Guid id);
         Task<OperationType?> GetByNameAsync(string name);
-        Task<List<OperationType>> GetAllAsync();
     }
 }

@@ -6,17 +6,54 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using System.Threading.Tasks;
 
 namespace Bank.Infrastructure.Repositories
 {
-    public class VerificationCodeRepository : IVerificationCodeRepository
+    public class AuthRepository : IAuthRepository
     {
         private readonly BankDbContext _context;
 
-        public VerificationCodeRepository(BankDbContext context)
+        public AuthRepository(BankDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<Session?> GetSessionByTokenAsync(string token)
+        {
+            return await _context.Sessions
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.SessionToken == token);
+        }
+
+        public async Task AddSessionAsync(Session session)
+        {
+            await _context.Sessions.AddAsync(session);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteSessionAsync(Guid id)
+        {
+            var session = await _context.Sessions.FindAsync(id);
+            if (session != null)
+            {
+                _context.Sessions.Remove(session);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteExpiredSessionsAsync()
+        {
+            var expired = await _context.Sessions
+                .Where(s => s.ExpiresAt < DateTime.UtcNow)
+                .ToListAsync();
+
+            if (expired.Any())
+            {
+                _context.Sessions.RemoveRange(expired);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<VerificationCode?> GetValidCodeAsync(Guid userId, string purpose, string code)
@@ -31,13 +68,13 @@ namespace Bank.Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(VerificationCode verificationCode)
+        public async Task AddVerificationCodeAsync(VerificationCode verificationCode)
         {
             await _context.VerificationCodes.AddAsync(verificationCode);
             await _context.SaveChangesAsync();
         }
 
-        public async Task MarkAsUsedAsync(Guid id)
+        public async Task MarkCodeAsUsedAsync(Guid id)
         {
             var code = await _context.VerificationCodes.FindAsync(id);
             if (code != null)
@@ -47,7 +84,7 @@ namespace Bank.Infrastructure.Repositories
             }
         }
 
-        public async Task DeleteExpiredAsync()
+        public async Task DeleteExpiredCodesAsync()
         {
             var expired = await _context.VerificationCodes
                 .Where(v => v.ExpiresAt < DateTime.UtcNow || v.IsUsed)
@@ -60,4 +97,5 @@ namespace Bank.Infrastructure.Repositories
             }
         }
     }
+
 }
