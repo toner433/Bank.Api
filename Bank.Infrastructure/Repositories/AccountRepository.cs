@@ -10,56 +10,44 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Infrastructure.Repositories
 {
-    public class AccountRepository : BaseRepository<Account>, IAccountRepository
+    public class AccountRepository : IAccountRepository
     {
-        public AccountRepository(BankDbContext context) : base(context)
+        private readonly IDataBaseRepository _repository;
+
+        public AccountRepository(IDataBaseRepository repository)
         {
+            _repository = repository;
         }
 
         public async Task<List<Account>> GetByUserIdAsync(Guid userId)
         {
-            return await _context.Accounts
-                .Where(a => a.UserId == userId)
-                .ToListAsync();
+            var accounts = await _repository.GetAllAsync<Account>();
+            return accounts.Where(a => a.UserId == userId).ToList();
         }
 
         public async Task<Account?> GetByAccountNumberAsync(string accountNumber)
         {
-            return await _context.Accounts
-                .Include(a => a.User)
-                .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+            var accounts = await _repository.GetAllAsync<Account>();
+            return accounts.FirstOrDefault(a => a.AccountNumber == accountNumber);
         }
-
-   
 
         public async Task<AccountOperation?> GetOperationByIdAsync(Guid id)
         {
-            return await _context.AccountOperations
-                .Include(o => o.OperationType)
-                .Include(o => o.FromAccount)
-                .Include(o => o.ToAccount)
-                .FirstOrDefaultAsync(o => o.Id == id);
+            var operations = await _repository.GetAllAsync<AccountOperation>();
+            return operations.FirstOrDefault(o => o.Id == id);
         }
 
         public async Task<List<AccountOperation>> GetOperationsByAccountIdAsync(Guid accountId)
         {
-            return await _context.AccountOperations
-                .Include(o => o.OperationType)
-                .Where(o => o.FromAccountId == accountId || o.ToAccountId == accountId)
+            var operations = await _repository.GetAllAsync<AccountOperation>();
+            return operations.Where(o => o.FromAccountId == accountId || o.ToAccountId == accountId)
                 .OrderByDescending(o => o.CreatedAt)
-                .ToListAsync();
+                .ToList();
         }
 
         public async Task AddOperationAsync(AccountOperation operation)
         {
-            await _context.AccountOperations.AddAsync(operation);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateOperationAsync(AccountOperation operation)
-        {
-            _context.AccountOperations.Update(operation);
-            await _context.SaveChangesAsync();
+            await _repository.AddAsync(operation);
         }
     }
 }

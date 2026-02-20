@@ -10,16 +10,19 @@ using System.Threading.Tasks;
 
 namespace Bank.Infrastructure.Repositories
 {
-    public class OperationTypeRepository : BaseRepository<OperationType>, IOperationTypeRepository
+    public class OperationTypeRepository : IOperationTypeRepository
     {
-        public OperationTypeRepository(BankDbContext context) : base(context)
+        private readonly IDataBaseRepository _repository;
+
+        public OperationTypeRepository(IDataBaseRepository repository)
         {
+            _repository = repository;
         }
 
         public async Task<OperationType?> GetByNameAsync(string name)
         {
-            return await _context.OperationTypes
-                .FirstOrDefaultAsync(t => t.Name == name);
+            var types = await _repository.GetAllAsync<OperationType>();
+            return types.FirstOrDefault(t => t.Name == name);
         }
     }
 }

@@ -10,40 +10,40 @@ using Bank.Infrastructure.Context;
 
 namespace Bank.Infrastructure.Repositories
 {
-    public class BaseRepository<T> : IRepository<T> where T : class
+    public class DataBaseRepository : IDataBaseRepository
     {
-        protected readonly BankDbContext _context;
+        private readonly BankDbContext _context;
 
-        public BaseRepository(BankDbContext context)
+        public DataBaseRepository(BankDbContext context)
         {
             _context = context;
         }
 
-        public virtual async Task<T?> GetByIdAsync(Guid id)
+        public async Task<T?> GetByIdAsync<T>(Guid id) where T : class
         {
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public virtual async Task<List<T>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync<T>() where T : class
         {
             return await _context.Set<T>().ToListAsync();
         }
 
-        public virtual async Task AddAsync(T entity)
+        public async Task AddAsync<T>(T entity) where T : class
         {
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public virtual async Task UpdateAsync(T entity)
+        public async Task UpdateAsync<T>(T entity) where T : class
         {
             _context.Set<T>().Update(entity);
             await _context.SaveChangesAsync();
         }
 
-        public virtual async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync<T>(Guid id) where T : class
         {
-            var entity = await GetByIdAsync(id);
+            var entity = await GetByIdAsync<T>(id);
             if (entity != null)
             {
                 _context.Set<T>().Remove(entity);

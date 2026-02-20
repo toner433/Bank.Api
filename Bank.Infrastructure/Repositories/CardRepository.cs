@@ -10,53 +10,50 @@ using System.Threading.Tasks;
 
 namespace Bank.Infrastructure.Repositories
 {
-    public class CardRepository : BaseRepository<Card>, ICardRepository
+    public class CardRepository : ICardRepository
     {
-        public CardRepository(BankDbContext context) : base(context)
+        private readonly IDataBaseRepository _repository;
+
+        public CardRepository(IDataBaseRepository repository)
         {
+            _repository = repository;
         }
 
         public async Task<List<Card>> GetByAccountIdAsync(Guid accountId)
         {
-            return await _context.Cards
-                .Where(c => c.AccountId == accountId)
-                .ToListAsync();
+            var cards = await _repository.GetAllAsync<Card>();
+            return cards.Where(c => c.AccountId == accountId).ToList();
         }
 
         public async Task<List<Card>> GetByUserIdAsync(Guid userId)
         {
-            return await _context.Cards
-                .Where(c => c.UserId == userId)
-                .ToListAsync();
+            var cards = await _repository.GetAllAsync<Card>();
+            return cards.Where(c => c.UserId == userId).ToList();
         }
 
         public async Task<Card?> GetByCardNumberAsync(string cardNumber)
         {
-            return await _context.Cards
-                .Include(c => c.Account)
-                .FirstOrDefaultAsync(c => c.CardNumber == cardNumber);
+            var cards = await _repository.GetAllAsync<Card>();
+            return cards.FirstOrDefault(c => c.CardNumber == cardNumber);
         }
-
 
         public async Task<CardOperation?> GetOperationByIdAsync(Guid id)
         {
-            return await _context.CardOperations
-                .Include(o => o.Card)
-                .FirstOrDefaultAsync(o => o.Id == id);
+            var operations = await _repository.GetAllAsync<CardOperation>();
+            return operations.FirstOrDefault(o => o.Id == id);
         }
 
         public async Task<List<CardOperation>> GetOperationsByCardIdAsync(Guid cardId)
         {
-            return await _context.CardOperations
-                .Where(o => o.CardId == cardId)
+            var operations = await _repository.GetAllAsync<CardOperation>();
+            return operations.Where(o => o.CardId == cardId)
                 .OrderByDescending(o => o.CreatedAt)
-                .ToListAsync();
+                .ToList();
         }
 
         public async Task AddOperationAsync(CardOperation operation)
         {
-            await _context.CardOperations.AddAsync(operation);
-            await _context.SaveChangesAsync();
+            await _repository.AddAsync(operation);
         }
     }
 }

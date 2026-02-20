@@ -10,11 +10,8 @@ namespace Bank.Domain.Interfaces
     public interface IAuthRepository
     {
         Task<Session?> GetSessionByTokenAsync(string token);
-        Task AddSessionAsync(Session session);
-        Task DeleteSessionAsync(Guid id);
         Task DeleteExpiredSessionsAsync();
         Task<VerificationCode?> GetValidCodeAsync(Guid userId, string purpose, string code);
-        Task AddVerificationCodeAsync(VerificationCode verificationCode);
         Task MarkCodeAsUsedAsync(Guid id);
         Task DeleteExpiredCodesAsync();
     }

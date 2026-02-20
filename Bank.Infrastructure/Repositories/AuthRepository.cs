@@ -13,87 +13,60 @@ namespace Bank.Infrastructure.Repositories
 {
     public class AuthRepository : IAuthRepository
     {
-        private readonly BankDbContext _context;
+        private readonly IDataBaseRepository _repository;
 
-        public AuthRepository(BankDbContext context)
+        public AuthRepository(IDataBaseRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         public async Task<Session?> GetSessionByTokenAsync(string token)
         {
-            return await _context.Sessions
-                .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.SessionToken == token);
-        }
-
-        public async Task AddSessionAsync(Session session)
-        {
-            await _context.Sessions.AddAsync(session);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteSessionAsync(Guid id)
-        {
-            var session = await _context.Sessions.FindAsync(id);
-            if (session != null)
-            {
-                _context.Sessions.Remove(session);
-                await _context.SaveChangesAsync();
-            }
+            var sessions = await _repository.GetAllAsync<Session>();
+            return sessions.FirstOrDefault(s => s.SessionToken == token);
         }
 
         public async Task DeleteExpiredSessionsAsync()
         {
-            var expired = await _context.Sessions
-                .Where(s => s.ExpiresAt < DateTime.UtcNow)
-                .ToListAsync();
+            var sessions = await _repository.GetAllAsync<Session>();
+            var expired = sessions.Where(s => s.ExpiresAt < DateTime.UtcNow).ToList();
 
-            if (expired.Any())
+            foreach (var session in expired)
             {
-                _context.Sessions.RemoveRange(expired);
-                await _context.SaveChangesAsync();
+                await _repository.DeleteAsync<Session>(session.Id);
             }
         }
 
         public async Task<VerificationCode?> GetValidCodeAsync(Guid userId, string purpose, string code)
         {
-            return await _context.VerificationCodes
-                .Where(v => v.UserId == userId &&
-                            v.Purpose == purpose &&
-                            v.Code == code &&
-                            !v.IsUsed &&
-                            v.ExpiresAt > DateTime.UtcNow)
+            var codes = await _repository.GetAllAsync<VerificationCode>();
+            return codes.Where(v => v.UserId == userId &&
+                v.Purpose == purpose &&
+                v.Code == code &&
+                !v.IsUsed &&
+                v.ExpiresAt > DateTime.UtcNow)
                 .OrderByDescending(v => v.CreatedAt)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task AddVerificationCodeAsync(VerificationCode verificationCode)
-        {
-            await _context.VerificationCodes.AddAsync(verificationCode);
-            await _context.SaveChangesAsync();
+                .FirstOrDefault();
         }
 
         public async Task MarkCodeAsUsedAsync(Guid id)
         {
-            var code = await _context.VerificationCodes.FindAsync(id);
+            var code = await _repository.GetByIdAsync<VerificationCode>(id);
             if (code != null)
             {
                 code.IsUsed = true;
-                await _context.SaveChangesAsync();
+                await _repository.UpdateAsync(code);
             }
         }
 
         public async Task DeleteExpiredCodesAsync()
         {
-            var expired = await _context.VerificationCodes
-                .Where(v => v.ExpiresAt < DateTime.UtcNow || v.IsUsed)
-                .ToListAsync();
+            var codes = await _repository.GetAllAsync<VerificationCode>();
+            var expired = codes.Where(v => v.ExpiresAt < DateTime.UtcNow || v.IsUsed).ToList();
 
-            if (expired.Any())
+            foreach (var code in expired)
             {
-                _context.VerificationCodes.RemoveRange(expired);
-                await _context.SaveChangesAsync();
+                await _repository.DeleteAsync<VerificationCode>(code.Id);
             }
         }
     }
