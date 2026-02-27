@@ -10,5 +10,6 @@ namespace Bank.Domain.Models
         public string SessionToken { get; set; }
         public DateTime ExpiresAt { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsActive { get; set; }
     }
 }

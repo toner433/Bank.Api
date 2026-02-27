@@ -34,7 +34,7 @@ namespace Bank.Infrastructure.Configurations
                 .HasMaxLength(5)
                 .IsRequired();
 
-            builder.Property(x => x.CardholderName)
+            builder.Property(x => x.CardHolderName)
                 .HasColumnName("cardholder_name")
                 .HasMaxLength(100)
                 .IsRequired();
@@ -44,10 +44,9 @@ namespace Bank.Infrastructure.Configurations
                 .HasMaxLength(10)
                 .HasDefaultValue("debit");
 
-            builder.Property(x => x.Status)
-                .HasColumnName("status")
-                .HasMaxLength(10)
-                .HasDefaultValue("active");
+            builder.Property(x => x.IsBlocked)
+                .HasColumnName("is_blocked")
+                .HasDefaultValue(false);
 
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
