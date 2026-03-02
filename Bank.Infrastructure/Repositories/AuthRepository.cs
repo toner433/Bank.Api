@@ -59,15 +59,19 @@ namespace Bank.Infrastructure.Repositories
             }
         }
 
-        public async Task DeleteExpiredCodesAsync()
+        public async Task<int> DeleteExpiredCodesAsync()
         {
-            var codes = await _repository.GetAllAsync<VerificationCode>();
-            var expired = codes.Where(v => v.ExpiresAt < DateTime.UtcNow || v.IsUsed).ToList();
+            var allCodes = await _repository.GetAllAsync<VerificationCode>();
+            var expired = allCodes.Where(x => x.ExpiresAt < DateTime.UtcNow || x.IsUsed).ToList();
+
+            int count = expired.Count;
 
             foreach (var code in expired)
             {
                 await _repository.DeleteAsync<VerificationCode>(code.Id);
             }
+
+            return count;
         }
     }
 

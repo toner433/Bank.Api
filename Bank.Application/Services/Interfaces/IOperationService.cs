@@ -13,6 +13,6 @@ namespace Bank.Application.Services.Interfaces
         Task<OperationDto> TransferAsync(TransferRequest request);
         Task<OperationDto?> GetOperationByIdAsync(Guid id);
         Task<List<OperationDto>> GetUserOperationsAsync(Guid userId, OperationFilterDto filter);
-        Task<List<OperationDto>> GetAccountOperationsAsync(Guid accountId, OperationFilterDto filter);
+        
     }
 }

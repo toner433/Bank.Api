@@ -5,6 +5,7 @@ VisualStudioVersion = 17.14.36616.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank_dbo", "Bank_dbo\Bank_dbo.csproj", "{A4C2F791-8E32-49E3-A9BB-1A8A8F198D87}"
 	ProjectSection(ProjectDependencies) = postProject
+		{81634794-063E-4CF0-8795-629B1C9B6FEB} = {81634794-063E-4CF0-8795-629B1C9B6FEB}
 		{9573AFAC-9ABC-41D9-8337-C387229CD746} = {9573AFAC-9ABC-41D9-8337-C387229CD746}
 	EndProjectSection
 EndProject

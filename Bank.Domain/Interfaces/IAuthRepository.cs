@@ -13,6 +13,6 @@ namespace Bank.Domain.Interfaces
         Task DeleteExpiredSessionsAsync();
         Task<VerificationCode?> GetValidCodeAsync(Guid userId, string purpose, string code);
         Task MarkCodeAsUsedAsync(Guid id);
-        Task DeleteExpiredCodesAsync();
+        Task<int> DeleteExpiredCodesAsync();
     }
 }
