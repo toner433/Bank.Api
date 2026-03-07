@@ -12,7 +12,7 @@ namespace Bank.Domain.Models
         public string Phone { get; set; }
         public string FullName { get; set; }
         public string PassportNumber { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
         public bool IsBlocked { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<Account> Accounts { get; set; }

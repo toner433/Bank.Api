@@ -8,7 +8,7 @@ namespace Bank.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    
     public class CardsController : ControllerBase
     {
         private readonly ICardService _cardService;

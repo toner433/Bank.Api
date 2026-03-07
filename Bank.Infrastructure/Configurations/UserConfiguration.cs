@@ -40,10 +40,13 @@ namespace Bank.Infrastructure.Configurations
 
             builder.Property(x => x.PassportNumber)
                 .HasColumnName("passport_number")
-                .HasMaxLength(6);
+                .HasMaxLength(12)
+                .IsRequired(); 
+
 
             builder.Property(x => x.BirthDate)
-                .HasColumnName("birth_date");
+                .HasColumnName("birth_date")
+                .IsRequired() ;
 
             builder.Property(x => x.IsBlocked)
                 .HasColumnName("is_blocked")

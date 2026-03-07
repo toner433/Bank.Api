@@ -73,6 +73,8 @@ namespace Bank.Application.Services.Implementations
                 Email = request.Email,
                 Phone = request.Phone,
                 FullName = request.FullName,
+                PassportNumber = request.PassportNumber,  
+                BirthDate = request.BirthDate,
                 IsBlocked = false,
                 CreatedAt = DateTime.UtcNow
             };

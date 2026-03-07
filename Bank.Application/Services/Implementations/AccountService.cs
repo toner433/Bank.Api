@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Bank.Domain.Interfaces;
 using Bank.Domain.Models;
@@ -15,15 +16,18 @@ namespace Bank.Application.Services.Implementations
         private readonly IAccountRepository _accountRepository;
         private readonly IUserRepository _userRepository;
         private readonly IDataBaseRepository _dbRepository;
+        private readonly IOperationTypeRepository _operationTypeRepository;
 
         public AccountService(
             IAccountRepository accountRepository,
             IUserRepository userRepository,
-            IDataBaseRepository dbRepository)
+            IDataBaseRepository dbRepository,
+            IOperationTypeRepository operationTypeRepository)
         {
             _accountRepository = accountRepository;
             _userRepository = userRepository;
             _dbRepository = dbRepository;
+            _operationTypeRepository = operationTypeRepository;
         }
 
         private async Task<AccountDto> MapToAccountDto(Account account)
@@ -38,7 +42,7 @@ namespace Bank.Application.Services.Implementations
                 Currency = account.Currency,
                 AccountType = account.AccountType,
                 OpenedAt = account.OpenedAt,
-                OwnerName = user.FullName 
+                OwnerName = user?.FullName ?? "Неизвестно"
             };
         }
 
@@ -51,7 +55,6 @@ namespace Bank.Application.Services.Implementations
         {
             var account = await _dbRepository.GetByIdAsync<Account>(id);
             if (account == null) return null;
-
             return await MapToAccountDto(account);
         }
 
@@ -93,7 +96,6 @@ namespace Bank.Application.Services.Implementations
         {
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
             if (account == null) throw new NotFoundException("Счет не найден");
-
             return account.Balance;
         }
 
@@ -107,7 +109,6 @@ namespace Bank.Application.Services.Implementations
 
             foreach (var op in operations)
             {
-                
                 if (filter.FromDate.HasValue && op.CreatedAt < filter.FromDate.Value)
                     continue;
 
@@ -132,9 +133,9 @@ namespace Bank.Application.Services.Implementations
                 {
                     Id = op.Id,
                     Amount = op.Amount,
-                    OperationType = op.OperationType.Name,
-                    Description = op.Description,
-                    Status = op.Status ,
+                    OperationType = op.OperationType?.Name ?? "Неизвестно",
+                    Description = op.Description ?? "",
+                    Status = op.Status ?? "",
                     CreatedAt = op.CreatedAt,
                     FromAccountNumber = fromNumber,
                     ToAccountNumber = toNumber
@@ -149,6 +150,93 @@ namespace Bank.Application.Services.Implementations
             }
 
             return result;
+        }
+
+        public async Task<OperationDto> DepositAsync(Guid accountId, decimal amount, string description = "Пополнение счета")
+        {
+            if (amount <= 0)
+                throw new BusinessException("Сумма должна быть больше 0");
+
+            var account = await _dbRepository.GetByIdAsync<Account>(accountId);
+            if (account == null)
+                throw new NotFoundException("Счет не найден");
+
+            var operationType = await _operationTypeRepository.GetByNameAsync("DEPOSIT");
+            if (operationType == null)
+                throw new BusinessException("Тип операции не найден");
+
+            var operation = new AccountOperation
+            {
+                Id = Guid.NewGuid(),
+                ToAccountId = account.Id,
+                Amount = amount,
+                OperationTypeId = operationType.Id,
+                Description = description,
+                Status = "Completed",
+                CreatedAt = DateTime.UtcNow,
+                CompletedAt = DateTime.UtcNow
+            };
+
+            account.Balance += amount;
+
+            await _dbRepository.UpdateAsync(account);
+            await _accountRepository.AddOperationAsync(operation);
+
+            return new OperationDto
+            {
+                Id = operation.Id,
+                Amount = operation.Amount,
+                OperationType = operationType.Name,
+                Description = operation.Description,
+                Status = operation.Status,
+                CreatedAt = operation.CreatedAt,
+                ToAccountNumber = account.AccountNumber
+            };
+        }
+
+        public async Task<OperationDto> WithdrawAsync(Guid accountId, decimal amount, string description = "Снятие со счета")
+        {
+            if (amount <= 0)
+                throw new BusinessException("Сумма должна быть больше 0");
+
+            var account = await _dbRepository.GetByIdAsync<Account>(accountId);
+            if (account == null)
+                throw new NotFoundException("Счет не найден");
+
+            if (account.Balance < amount)
+                throw new BusinessException("Недостаточно средств");
+
+            var operationType = await _operationTypeRepository.GetByNameAsync("WITHDRAWAL");
+            if (operationType == null)
+                throw new BusinessException("Тип операции не найден");
+
+            var operation = new AccountOperation
+            {
+                Id = Guid.NewGuid(),
+                FromAccountId = account.Id,
+                Amount = amount,
+                OperationTypeId = operationType.Id,
+                Description = description,
+                Status = "Completed",
+                CreatedAt = DateTime.UtcNow,
+                CompletedAt = DateTime.UtcNow
+            };
+
+            account.Balance -= amount;
+
+            await _dbRepository.UpdateAsync(account);
+            await _accountRepository.AddOperationAsync(operation);
+
+            return new OperationDto
+            {
+                Id = operation.Id,
+                Amount = operation.Amount,
+                OperationType = operationType.Name,
+                Description = operation.Description,
+                Status = operation.Status,
+                CreatedAt = operation.CreatedAt,
+                FromAccountNumber = account.AccountNumber
+            };
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Bank.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    
     public class OperationsController : ControllerBase
     {
         private readonly IOperationService _operationService;

@@ -15,5 +15,7 @@ namespace Bank.Application.Services.Interfaces
         Task<AccountDto> CreateAccountAsync(CreateAccountRequest request);
         Task<decimal> GetBalanceAsync(Guid accountId);
         Task<List<OperationDto>> GetAccountHistoryAsync(Guid accountId, OperationFilterDto filter);
+        Task<OperationDto> DepositAsync(Guid accountId, decimal amount, string description = "Пополнение счета");
+        Task<OperationDto> WithdrawAsync(Guid accountId, decimal amount, string description = "Снятие со счета");
     }
 }

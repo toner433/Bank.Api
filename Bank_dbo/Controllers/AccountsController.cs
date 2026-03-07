@@ -9,7 +9,7 @@ namespace Bank.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    
     public class AccountsController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -88,6 +88,41 @@ namespace Bank.API.Controllers
             try
             {
                 var result = await _operationService.TransferAsync(request);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+        [HttpPost("{id}/deposit")]
+        public async Task<IActionResult> Deposit(Guid id, [FromBody] decimal amount)
+        {
+            try
+            {
+                var result = await _accountService.DepositAsync(id, amount);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/withdraw")]
+        public async Task<IActionResult> Withdraw(Guid id, [FromBody] decimal amount)
+        {
+            try
+            {
+                var result = await _accountService.WithdrawAsync(id, amount);
                 return Ok(result);
             }
             catch (NotFoundException ex)
