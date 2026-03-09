@@ -31,7 +31,7 @@ namespace Bank.Application.Services.Implementations
                 ExpiresAt = session.ExpiresAt,
                 IsActive = session.IsActive,
                 UserId = session.UserId,
-                UserLogin = session.User.Login 
+                UserLogin = session.User?.Login ??"" 
             };
         }
 

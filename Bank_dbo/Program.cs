@@ -1,9 +1,11 @@
-using Microsoft.EntityFrameworkCore;
+using Bank.API.Handlers;
+using Bank.Application.Services.Implementations;
+using Bank.Application.Services.Interfaces;
+using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Context;
 using Bank.Infrastructure.Repositories;
-using Bank.Domain.Interfaces;
-using Bank.Application.Services.Interfaces;
-using Bank.Application.Services.Implementations;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +41,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "Session";
+    options.DefaultChallengeScheme = "Session";
+})
+.AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", null);
+
+app.UseAuthentication();
+app.UseMiddleware<Bank.API.Middleware.SessionAuthMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

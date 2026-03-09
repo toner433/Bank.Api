@@ -23,7 +23,14 @@ namespace Bank.Infrastructure.Repositories
         public async Task<Session?> GetSessionByTokenAsync(string token)
         {
             var sessions = await _repository.GetAllAsync<Session>();
-            return sessions.FirstOrDefault(s => s.SessionToken == token);
+            var session = sessions.FirstOrDefault(s => s.SessionToken == token);
+
+            if (session != null)
+            {
+                session.User = await _repository.GetByIdAsync<User>(session.UserId);
+            }
+
+            return session;
         }
 
         public async Task DeleteExpiredSessionsAsync()

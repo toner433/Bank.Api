@@ -9,7 +9,7 @@ namespace Bank.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    
+    [Authorize] 
     public class AccountsController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -99,6 +99,7 @@ namespace Bank.API.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
         [HttpPost("{id}/deposit")]
         public async Task<IActionResult> Deposit(Guid id, [FromBody] decimal amount)
         {
