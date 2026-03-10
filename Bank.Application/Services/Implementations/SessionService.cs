@@ -72,7 +72,7 @@ namespace Bank.Application.Services.Implementations
         public async Task<bool> ValidateTokenAsync(string token)
         {
             var session = await _authRepository.GetSessionByTokenAsync(token);
-
+            Console.WriteLine($"Session found: {session != null}");  
             if (session == null) return false;
             if (!session.IsActive) return false;
             if (session.ExpiresAt < DateTime.UtcNow) return false;

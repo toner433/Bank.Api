@@ -18,12 +18,29 @@ namespace Bank.API.Handlers
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
            
-            if (Context.User.Identity?.IsAuthenticated == true)
+
+            if (Context.Items.ContainsKey("UserId"))
             {
-                return Task.FromResult(AuthenticateResult.Success(
-                    new AuthenticationTicket(Context.User, Scheme.Name)));
+                var userId = Context.Items["UserId"]?.ToString();
+                
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    var claims = new[]
+                    {
+                new Claim(ClaimTypes.NameIdentifier, userId)
+            };
+
+                    var identity = new ClaimsIdentity(claims, Scheme.Name);
+                    var principal = new ClaimsPrincipal(identity);
+                    var ticket = new AuthenticationTicket(principal, Scheme.Name);
+
+                   
+                    return Task.FromResult(AuthenticateResult.Success(ticket));
+                }
             }
 
+           
             return Task.FromResult(AuthenticateResult.NoResult());
         }
     }

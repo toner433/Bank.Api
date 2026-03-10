@@ -16,7 +16,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<BankDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 builder.Services.AddScoped<IDataBaseRepository, DataBaseRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
@@ -24,13 +23,21 @@ builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IOperationTypeRepository, OperationTypeRepository>();
 
-
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ICardService, CardService>();
 builder.Services.AddScoped<IOperationService, OperationService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "Session";
+    options.DefaultChallengeScheme = "Session";
+})
+.AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", null);
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -41,18 +48,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = "Session";
-    options.DefaultChallengeScheme = "Session";
-})
-.AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", null);
-
-app.UseAuthentication();
 app.UseMiddleware<Bank.API.Middleware.SessionAuthMiddleware>();
+app.UseAuthentication();
+
 app.UseAuthorization();
 app.MapControllers();
-
 
 using (var scope = app.Services.CreateScope())
 {
