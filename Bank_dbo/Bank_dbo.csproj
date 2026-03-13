@@ -7,10 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="bank-frontend\src\pages\AccountDetail.tsx" />
     <None Remove="bank-frontend\src\pages\Accounts.tsx" />
+    <None Remove="bank-frontend\src\pages\CardDetail.tsx" />
+    <None Remove="bank-frontend\src\pages\Cards.tsx" />
+    <None Remove="bank-frontend\src\pages\CreateCard.tsx" />
     <None Remove="bank-frontend\src\pages\Dashboard.tsx" />
     <None Remove="bank-frontend\src\pages\Login.tsx" />
     <None Remove="bank-frontend\src\pages\Profile.tsx" />
+    <None Remove="bank-frontend\src\pages\Register.tsx" />
+    <None Remove="bank-frontend\src\pages\Transfer.tsx" />
     <None Remove="bank-frontend\src\services\api.ts" />
   </ItemGroup>
 
@@ -34,10 +40,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="bank-frontend\src\pages\AccountDetail.tsx" />
     <TypeScriptCompile Include="bank-frontend\src\pages\Accounts.tsx" />
+    <TypeScriptCompile Include="bank-frontend\src\pages\CardDetail.tsx" />
+    <TypeScriptCompile Include="bank-frontend\src\pages\Cards.tsx" />
+    <TypeScriptCompile Include="bank-frontend\src\pages\CreateCard.tsx" />
     <TypeScriptCompile Include="bank-frontend\src\pages\Dashboard.tsx" />
     <TypeScriptCompile Include="bank-frontend\src\pages\Login.tsx" />
     <TypeScriptCompile Include="bank-frontend\src\pages\Profile.tsx" />
+    <TypeScriptCompile Include="bank-frontend\src\pages\Register.tsx" />
+    <TypeScriptCompile Include="bank-frontend\src\pages\Transfer.tsx" />
     <TypeScriptCompile Include="bank-frontend\src\services\api.ts" />
     <TypeScriptCompile Include="bank-frontend\src\types\User.ts" />
   </ItemGroup>

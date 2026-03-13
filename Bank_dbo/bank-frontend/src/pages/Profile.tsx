@@ -104,7 +104,7 @@ const Profile: React.FC = () => {
 
             <footer className="app-footer">
                 <div className="container">
-                    <p>D-bank © 2024</p>
+                    <p>D-bank © 2026</p>
                 </div>
             </footer>
         </>

@@ -35,6 +35,12 @@ const Accounts: React.FC = () => {
 
             <main>
                 <div className="container">
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Мои счета</h2>
+                        <Link to="/transfer" className="btn">
+                            Новый перевод
+                        </Link>
+                    </div>
                     <div className="row">
                         <div className="col-12">
                             <div className="card">
@@ -89,7 +95,7 @@ const Accounts: React.FC = () => {
 
             <footer className="app-footer">
                 <div className="container">
-                    <p>D-bank © 2024</p>
+                    <p>D-bank © 2026</p>
                 </div>
             </footer>
         </>

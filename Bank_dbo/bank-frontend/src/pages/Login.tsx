@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 
 const Login: React.FC = () => {
@@ -74,11 +74,17 @@ const Login: React.FC = () => {
                         </div>
                     </div>
                 </div>
+                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                    <Link to="/register" className="nav-link">
+                        Нет аккаунта? Зарегистрироваться
+                    </Link>
+                </div>
             </main>
+
 
             <footer className="app-footer">
                 <div className="container">
-                    <p>D-bank © 2024</p>
+                    <p>D-bank © 2026</p>
                 </div>
             </footer>
         </>

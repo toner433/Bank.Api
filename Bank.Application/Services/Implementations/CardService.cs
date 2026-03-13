@@ -105,6 +105,7 @@ namespace Bank.Application.Services.Implementations
                 Id = Guid.NewGuid(),
                 AccountId = request.AccountId,
                 CardNumber = GenerateCardNumber(),
+                UserId = account.UserId,
                 CardHolderName = request.CardHolderName,
                 ExpiryDate = DateTime.UtcNow.AddYears(3).ToString("MM/yy"),
                 CardType = request.CardType,

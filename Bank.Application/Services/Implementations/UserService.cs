@@ -62,6 +62,26 @@ namespace Bank.Application.Services.Implementations
 
         public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
         {
+            if (request.Login.Length > 20)
+                throw new BusinessException("Логин не может быть длиннее 20 символов");
+
+            if (request.Password.Length < 6)
+                throw new BusinessException("Пароль должен быть минимум 6 символов");
+            if (request.Password.Length > 20)
+                throw new BusinessException("Пароль не может быть длиннее 100 символов");
+
+            if (request.Email.Length > 50)
+                throw new BusinessException("Email не может быть длиннее 100 символов");
+
+            if (request.Phone.Length > 20)
+                throw new BusinessException("Телефон не может быть длиннее 20 символов");
+
+            if (request.FullName.Length > 70)
+                throw new BusinessException("ФИО не может быть длиннее 200 символов");
+
+            if (request.PassportNumber.Length > 12)
+                throw new BusinessException("Номер паспорта не может быть длиннее 12 символов");
+
             var exists = await _userRepository.ExistsAsync(request.Login);
             if (exists) throw new BusinessException("Логин уже занят");
 

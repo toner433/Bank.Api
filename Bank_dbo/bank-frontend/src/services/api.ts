@@ -31,7 +31,20 @@ export const userApi = {
 export const accountApi = {
     getByUserId: (userId: string) => api.get(`/Accounts/user/${userId}`),
     getById: (id: string) => api.get(`/Accounts/${id}`),
+    getHistory: (id: string) => api.get(`/Accounts/${id}/history`),
     create: (data: any) => api.post('/Accounts', data),
     deposit: (id: string, amount: number) => api.post(`/Accounts/${id}/deposit`, amount),
     withdraw: (id: string, amount: number) => api.post(`/Accounts/${id}/withdraw`, amount),
+};
+export const cardApi = {
+    getByUserId: (userId: string) => api.get(`/Cards/user/${userId}`),
+    getById: (id: string) => api.get(`/Cards/${id}`),
+    create: (data: any) => api.post('/Cards', data),
+    block: (id: string) => api.post(`/Cards/${id}/block`),
+    unblock: (id: string) => api.post(`/Cards/${id}/unblock`),
+};
+export const operationApi = {
+    transfer: (data: any) => api.post('/Operations/transfer', data),
+    getById: (id: string) => api.get(`/Operations/${id}`),
+    getUserOperations: (userId: string, params?: any) => api.get(`/Operations/user/${userId}`, { params })
 };
