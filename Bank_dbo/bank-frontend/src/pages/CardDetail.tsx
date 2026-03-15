@@ -1,19 +1,24 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { cardApi } from '../services/api';
+import { cardApi, accountApi } from '../services/api';
 
 const CardDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [card, setCard] = useState<any>(null);
+    const [account, setAccount] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [showFullNumber, setShowFullNumber] = useState(false);
 
     useEffect(() => {
         const fetchCard = async () => {
             try {
                 const response = await cardApi.getById(id!);
                 setCard(response.data);
+
+                if (response.data.accountId) {
+                    const accRes = await accountApi.getById(response.data.accountId);
+                    setAccount(accRes.data);
+                }
             } catch (error) {
                 console.error('Ошибка загрузки карты', error);
             } finally {
@@ -64,94 +69,103 @@ const CardDetail: React.FC = () => {
 
             <main>
                 <div className="container">
-                    <div className="card">
-                        <div className="card-header">
-                            <h2>Детали карты</h2>
-                        </div>
-
-                        <div style={{
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            color: 'white',
-                            padding: '2rem',
-                            borderRadius: '8px',
-                            marginBottom: '2rem'
-                        }}>
-                            <div style={{ fontSize: '1.5rem', letterSpacing: '3px', marginBottom: '1.5rem' }}>
-                                {showFullNumber ? card.cardNumber : '**** **** **** ' + card.cardNumber.slice(-4)}
-                            </div>
-                            <button
-                                onClick={() => setShowFullNumber(!showFullNumber)}
-                                style={{
-                                    background: 'transparent',
-                                    border: '1px solid white',
-                                    color: 'white',
-                                    padding: '0.25rem 1rem',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    marginBottom: '1rem'
-                                }}
-                            >
-                                {showFullNumber ? 'Скрыть номер' : 'Показать номер'}
-                            </button>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <div>
-                                    <div style={{ fontSize: '0.875rem', opacity: 0.8 }}>Держатель</div>
-                                    <div style={{ fontSize: '1.25rem' }}>{card.cardHolderName}</div>
+                    <div className="row justify-content-center">
+                        <div className="col-md-7 col-lg-6">
+                            <div className="card">
+                                <div className="card-header">
+                                    <h2>Детали карты</h2>
                                 </div>
-                                <div>
-                                    <div style={{ fontSize: '0.875rem', opacity: 0.8 }}>Срок</div>
-                                    <div style={{ fontSize: '1.25rem' }}>{card.expiryDate}</div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="row">
-                            <div className="col-md-6">
-                                <div className="form-group">
-                                    <div className="form-label">Тип карты</div>
-                                    <div className="form-input" style={{ border: 'none', paddingLeft: 0 }}>
-                                        {card.cardType === 'Debit' ? 'Дебетовая' : 'Кредитная'}
+                               
+                                <div style={{
+                                    background: 'linear-gradient(145deg, #0a2540 0%, #1e3a5f 100%)',
+                                    color: '#ffffff',
+                                    padding: '2rem',
+                                    borderRadius: '16px',
+                                    marginBottom: '2rem',
+                                    boxShadow: '0 10px 25px rgba(10, 37, 64, 0.2)',
+                                    border: '1px solid rgba(255,255,255,0.1)'
+                                }}>
+                                    <div style={{
+                                        fontSize: '1.5rem',
+                                        letterSpacing: '3px',
+                                        marginBottom: '1rem',
+                                        fontFamily: 'monospace'
+                                    }}>
+                                        {card.cardNumber}
+                                    </div>
+                                    {account && (
+                                        <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '1rem' }}>
+                                            <div style={{ fontSize: '0.75rem', opacity: 0.7, textTransform: 'uppercase' }}>Баланс счёта</div>
+                                            <div style={{ fontSize: '1.5rem', fontWeight: 300 }}>
+                                                {account.balance.toLocaleString('ru-RU')} {account.currency}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                                        <div>
+                                            <div style={{ fontSize: '0.75rem', opacity: 0.7, textTransform: 'uppercase' }}>Держатель</div>
+                                            <div style={{ fontSize: '1.2rem', fontWeight: 500 }}>{card.cardHolderName}</div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '0.75rem', opacity: 0.7, textTransform: 'uppercase' }}>Срок</div>
+                                            <div style={{ fontSize: '1.2rem', fontWeight: 500 }}>
+                                                {card.expiryDate?.length === 5 ? card.expiryDate : card.expiryDate?.substring(0, 5)} 
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                                
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <div className="form-group">
+                                            <div className="form-label">Тип карты</div>
+                                            <div className="form-input" style={{ border: 'none', paddingLeft: 0 }}>
+                                                {card.cardType === 'Debit' ? 'Дебетовая' : 'Кредитная'}
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <div className="form-label">Статус</div>
+                                            <div>
+                                                {card.isBlocked ? (
+                                                    <span style={{ color: '#e74c3c' }}>Заблокирована</span>
+                                                ) : (
+                                                    <span style={{ color: '#27ae60' }}>Активна</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="form-group">
+                                            <div className="form-label">Счёт</div>
+                                            <div className="form-input" style={{ border: 'none', paddingLeft: 0 }}>
+                                                {card.accountNumber}
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <div className="form-label">Дневной лимит</div>
+                                            <div className="form-input" style={{ border: 'none', paddingLeft: 0 }}>
+                                                {card.dailyLimit} 1000 BYN
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="form-group">
-                                    <div className="form-label">Статус</div>
-                                    <div>
-                                        {card.isBlocked ?
-                                            <span style={{ color: '#e74c3c' }}>Заблокирована</span> :
-                                            <span style={{ color: '#27ae60' }}>Активна</span>
-                                        }
-                                    </div>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+                                    {card.isBlocked ? (
+                                        <button onClick={handleUnblock} className="btn btn-success">
+                                            Разблокировать
+                                        </button>
+                                    ) : (
+                                        <button onClick={handleBlock} className="btn btn-danger">
+                                            Заблокировать
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-
-                            <div className="col-md-6">
-                                <div className="form-group">
-                                    <div className="form-label">Счет</div>
-                                    <div className="form-input" style={{ border: 'none', paddingLeft: 0 }}>
-                                        {card.accountNumber}
-                                    </div>
-                                </div>
-
-                                <div className="form-group">
-                                    <div className="form-label">Дневной лимит</div>
-                                    <div className="form-input" style={{ border: 'none', paddingLeft: 0 }}>
-                                        {card.dailyLimit} BYN
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                            {card.isBlocked ? (
-                                <button onClick={handleUnblock} className="btn btn-success">
-                                    Разблокировать
-                                </button>
-                            ) : (
-                                <button onClick={handleBlock} className="btn btn-danger">
-                                    Заблокировать
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>

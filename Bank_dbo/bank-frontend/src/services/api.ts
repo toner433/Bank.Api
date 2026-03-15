@@ -10,6 +10,7 @@ const api = axios.create({
     },
 });
 
+
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -17,6 +18,22 @@ api.interceptors.request.use((config) => {
     }
     return config;
 });
+
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+           
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
 
 export const authApi = {
     login: (data: LoginRequest) => api.post<AuthResponse>('/Auth/login', data),
@@ -36,6 +53,7 @@ export const accountApi = {
     deposit: (id: string, amount: number) => api.post(`/Accounts/${id}/deposit`, amount),
     withdraw: (id: string, amount: number) => api.post(`/Accounts/${id}/withdraw`, amount),
 };
+
 export const cardApi = {
     getByUserId: (userId: string) => api.get(`/Cards/user/${userId}`),
     getById: (id: string) => api.get(`/Cards/${id}`),
@@ -43,8 +61,9 @@ export const cardApi = {
     block: (id: string) => api.post(`/Cards/${id}/block`),
     unblock: (id: string) => api.post(`/Cards/${id}/unblock`),
 };
+
 export const operationApi = {
     transfer: (data: any) => api.post('/Operations/transfer', data),
     getById: (id: string) => api.get(`/Operations/${id}`),
-    getUserOperations: (userId: string, params?: any) => api.get(`/Operations/user/${userId}`, { params })
+    getUserOperations: (userId: string, params?: any) => api.get(`/Operations/user/${userId}`, { params }),
 };

@@ -47,7 +47,8 @@ const Cards: React.FC = () => {
                         </Link>
                     </div>
 
-                    <div className="row">
+                    
+                    <div className="row g-4">
                         {cards.length === 0 ? (
                             <div className="col-12">
                                 <div className="card">
@@ -58,30 +59,49 @@ const Cards: React.FC = () => {
                             </div>
                         ) : (
                             cards.map((card: any) => (
-                                <div key={card.id} className="col-md-6">
-                                    <div className="card">
+                                <div key={card.id} className="col-md-6 col-lg-4 col-xl-3">
+                                    <div className="card h-100">
                                         <div className="card-header">
-                                            <h3>{card.cardType === 'Debit' ? 'Дебетовая карта' : 'Кредитная карта'}</h3>
+                                            <h3>{card.cardType === 'Debit' ? 'Дебетовая' : 'Кредитная'}</h3>
                                         </div>
 
-                                        <div style={{
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            color: 'white',
-                                            padding: '1.5rem',
-                                            borderRadius: '8px',
-                                            marginBottom: '1rem'
-                                        }}>
-                                            <div style={{ fontSize: '1.25rem', letterSpacing: '2px', marginBottom: '1rem' }}>
-                                                {card.cardNumber}
-                                            </div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <div>
-                                                    <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Держатель</div>
-                                                    <div>{card.cardHolderName}</div>
+                                       
+                                        <div className="d-flex  mb-3">
+                                            <div style={{
+                                                background: 'linear-gradient(145deg, #0a2540 0%, #1e3a5f 100%)',
+                                                color: '#ffffff',
+                                                padding: '1.25rem',
+                                                borderRadius: '12px',
+                                                width: '300px',               
+                                                height: '160px',               
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                justifyContent: 'space-between',
+                                                boxShadow: '0 8px 20px rgba(10, 37, 64, 0.15)',
+                                                border: '1px solid rgba(255,255,255,0.1)'
+                                            }}>
+                                               
+                                                <div style={{
+                                                    fontSize: '1.1rem',
+                                                    letterSpacing: '2px',
+                                                    fontFamily: 'monospace',
+                                                    wordBreak: 'break-all'
+                                                }}>
+                                                    {card.cardNumber}
                                                 </div>
-                                                <div>
-                                                    <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>Срок</div>
-                                                    <div>{card.expiryDate}</div>
+
+                                               
+                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <div>
+                                                        <div style={{ fontSize: '0.65rem', opacity: 0.7, textTransform: 'uppercase' }}>Держатель</div>
+                                                        <div style={{ fontSize: '0.9rem', fontWeight: 500 }}>{card.cardHolderName}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontSize: '0.65rem', opacity: 0.7, textTransform: 'uppercase' }}>Срок</div>
+                                                        <div style={{ fontSize: '0.9rem', fontWeight: 500 }}>
+                                                            {card.expiryDate?.length === 5 ? card.expiryDate : card.expiryDate?.substring(0, 5)}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -91,22 +111,23 @@ const Cards: React.FC = () => {
                                                 <div className="form-group">
                                                     <div className="form-label">Статус</div>
                                                     <div>
-                                                        {card.isBlocked ?
-                                                            <span style={{ color: '#e74c3c' }}>Заблокирована</span> :
+                                                        {card.isBlocked ? (
+                                                            <span style={{ color: '#e74c3c' }}>Заблокирована</span>
+                                                        ) : (
                                                             <span style={{ color: '#27ae60' }}>Активна</span>
-                                                        }
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="col-6">
                                                 <div className="form-group">
                                                     <div className="form-label">Лимит</div>
-                                                    <div>{card.dailyLimit} {card.currency}</div>
+                                                    <div>{card.dailyLimit} {card.currency || 'BYN'}</div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <Link to={`/cards/${card.id}`} className="btn">
+                                        <Link to={`/cards/${card.id}`} className="btn mt-2">
                                             Подробнее
                                         </Link>
                                     </div>

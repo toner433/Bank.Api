@@ -310,16 +310,7 @@ const Register: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <button type="submit" style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        background: 'transparent',
-                                        border: '1px solid #2c3e50',
-                                        color: '#2c3e50',
-                                        fontSize: '1rem',
-                                        cursor: 'pointer',
-                                        marginTop: '1rem'
-                                    }}>
+                                    <button type="submit" className="btn btn-block">
                                         Зарегистрироваться
                                     </button>
                                 </form>
