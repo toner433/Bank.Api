@@ -21,6 +21,10 @@ namespace Bank.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
+            var uid = User.GetCurrentUserId();
+            if (uid == null) return Unauthorized();
+            if (id != uid.Value)
+                return Forbid();
             var user = await _userService.GetByIdAsync(id);
             if (user == null) return NotFound();
             return Ok(user);
@@ -37,6 +41,9 @@ namespace Bank.API.Controllers
         [HttpPut("{id}/profile")]
         public async Task<IActionResult> UpdateProfile(Guid id, UpdateProfileRequest request)
         {
+            var uid = User.GetCurrentUserId();
+            if (uid == null) return Unauthorized();
+            if (id != uid.Value) return Forbid();
             try
             {
                 var result = await _userService.UpdateProfileAsync(id, request);
@@ -51,6 +58,9 @@ namespace Bank.API.Controllers
         [HttpPost("{id}/change-password")]
         public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordRequest request)
         {
+            var uid = User.GetCurrentUserId();
+            if (uid == null) return Unauthorized();
+            if (id != uid.Value) return Forbid();
             try
             {
                 var result = await _userService.ChangePasswordAsync(id, request);

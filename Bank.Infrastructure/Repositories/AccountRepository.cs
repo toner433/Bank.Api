@@ -3,10 +3,8 @@ using Bank.Infrastructure.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Bank.Domain.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Infrastructure.Repositories
 {
@@ -19,16 +17,30 @@ namespace Bank.Infrastructure.Repositories
             _repository = repository;
         }
 
+        private static string NormalizeAccountNumber(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+            return new string(raw.Where(c => !char.IsWhiteSpace(c) && c != '\u00a0' && c != '\u2007').ToArray());
+        }
+
         public async Task<List<Account>> GetByUserIdAsync(Guid userId)
         {
             var accounts = await _repository.GetAllAsync<Account>();
             return accounts.Where(a => a.UserId == userId).ToList();
         }
 
-        public async Task<Account?> GetByAccountNumberAsync(string accountNumber)
+        public async Task<List<Account>> GetByOrganizationIdAsync(Guid organizationId)
         {
             var accounts = await _repository.GetAllAsync<Account>();
-            return accounts.FirstOrDefault(a => a.AccountNumber == accountNumber);
+            return accounts.Where(a => a.OrganizationId == organizationId).ToList();
+        }
+
+        public async Task<Account?> GetByAccountNumberAsync(string accountNumber)
+        {
+            var want = NormalizeAccountNumber(accountNumber);
+            if (string.IsNullOrEmpty(want)) return null;
+            var accounts = await _repository.GetAllAsync<Account>();
+            return accounts.FirstOrDefault(a => NormalizeAccountNumber(a.AccountNumber) == want);
         }
 
         public async Task<AccountOperation?> GetOperationByIdAsync(Guid id)

@@ -1,21 +1,21 @@
-﻿using Bank.Application.DTOs.Accounts;
-using Bank.Application.DTOs.Operations;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Bank.Application.DTOs.Accounts;
+using Bank.Application.DTOs.Operations;
 
 namespace Bank.Application.Services.Interfaces
 {
     public interface IAccountService
     {
-        Task<AccountDto?> GetByIdAsync(Guid id);
-        Task<List<AccountDto>> GetByUserIdAsync(Guid userId);
-        Task<AccountDto> CreateAccountAsync(CreateAccountRequest request);
-        Task<decimal> GetBalanceAsync(Guid accountId);
-        Task<List<OperationDto>> GetAccountHistoryAsync(Guid accountId, OperationFilterDto filter);
-        Task<OperationDto> DepositAsync(Guid accountId, decimal amount, string description = "Пополнение счета");
-        Task<OperationDto> WithdrawAsync(Guid accountId, decimal amount, string description = "Снятие со счета");
+        Task<AccountDto?> GetByIdAsync(Guid id, Guid actingUserId);
+        Task<List<AccountDto>> GetByUserIdAsync(Guid userId, Guid actingUserId);
+        Task<List<AccountDto>> GetAccessibleAccountsAsync(Guid actingUserId);
+        Task<AccountDto> CreateAccountAsync(CreateAccountRequest request, Guid actingUserId);
+        Task<decimal> GetBalanceAsync(Guid accountId, Guid actingUserId);
+        Task<List<OperationDto>> GetAccountHistoryAsync(Guid accountId, OperationFilterDto filter, Guid actingUserId);
+        Task<OperationDto> DepositAsync(Guid accountId, decimal amount, Guid actingUserId, string description = "Пополнение счета");
+        Task<OperationDto> WithdrawAsync(Guid accountId, decimal amount, Guid actingUserId, string description = "Снятие со счета");
+        Task<TransferRecipientPreviewDto?> LookupTransferRecipientAsync(string? accountNumber);
     }
 }

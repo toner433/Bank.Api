@@ -17,7 +17,11 @@ namespace Bank.Infrastructure.Configurations
                 .HasDefaultValueSql("gen_random_uuid()");
 
             builder.Property(x => x.UserId)
-                .HasColumnName("user_id");
+                .HasColumnName("user_id")
+                .IsRequired(false);
+
+            builder.Property(x => x.OrganizationId)
+                .HasColumnName("organization_id");
 
             builder.Property(x => x.AccountNumber)
                 .HasColumnName("account_number")
@@ -53,7 +57,14 @@ namespace Bank.Infrastructure.Configurations
             builder.HasOne(x => x.User)
                 .WithMany(x => x.Accounts)
                 .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+
+            builder.HasOne(x => x.Organization)
+                .WithMany(x => x.Accounts)
+                .HasForeignKey(x => x.OrganizationId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
         }
     }
 }

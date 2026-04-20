@@ -36,6 +36,7 @@ namespace Bank.Application.Services.Implementations
                 FullName = user.FullName,
                 Phone = user.Phone,
                 IsBlocked = user.IsBlocked,
+                IsAdmin = user.IsAdmin,
                 CreatedAt = user.CreatedAt
             };
         }

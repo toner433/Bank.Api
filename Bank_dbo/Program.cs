@@ -4,6 +4,7 @@ using Bank.Application.Services.Interfaces;
 using Bank.Domain.Interfaces;
 using Bank.Infrastructure.Context;
 using Bank.Infrastructure.Repositories;
+using Bank.Infrastructure.Seeding;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,6 +41,10 @@ builder.Services.AddScoped<ICardService, CardService>();
 builder.Services.AddScoped<IOperationService, OperationService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IPaymentOrderService, PaymentOrderService>();
+builder.Services.AddScoped<ITimeDepositService, TimeDepositService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -69,7 +74,8 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<BankDbContext>();
-    dbContext.Database.EnsureCreated();
+    dbContext.Database.Migrate();
+    await DevAdminSeeder.SeedAsync(dbContext);
 }
 
 app.Run();

@@ -38,7 +38,7 @@ namespace Bank.Application.Services.Implementations
                 CardType = card.CardType,
                 IsBlocked = card.IsBlocked,
                 AccountId = card.AccountId,
-                AccountNumber = account.AccountNumber 
+                AccountNumber = account?.AccountNumber ?? ""
             };
         }
 
@@ -99,13 +99,15 @@ namespace Bank.Application.Services.Implementations
         {
             var account = await _dbRepository.GetByIdAsync<Account>(request.AccountId);
             if (account == null) throw new NotFoundException("Счет не найден");
+            if (account.UserId == null)
+                throw new BusinessException("Карту можно выпустить только к личному счёту физлица");
 
             var card = new Card
             {
                 Id = Guid.NewGuid(),
                 AccountId = request.AccountId,
                 CardNumber = GenerateCardNumber(),
-                UserId = account.UserId,
+                UserId = account.UserId.Value,
                 CardHolderName = request.CardHolderName,
                 ExpiryDate = DateTime.UtcNow.AddYears(3).ToString("MM/yy"),
                 CardType = request.CardType,

@@ -10,9 +10,9 @@ namespace Bank.Application.Services.Interfaces
 {
     public interface IOperationService
     {
-        Task<OperationDto> TransferAsync(TransferRequest request);
+        Task<OperationDto> TransferAsync(TransferRequest request, Guid actingUserId);
         Task<OperationDto?> GetOperationByIdAsync(Guid id);
         Task<List<OperationDto>> GetUserOperationsAsync(Guid userId, OperationFilterDto filter);
-        
+        Task<List<OperationDto>> GetOrganizationOperationsAsync(Guid organizationId, Guid actingUserId, OperationFilterDto filter);
     }
 }

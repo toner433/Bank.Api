@@ -8,31 +8,66 @@ using Bank.Application.DTOs.Accounts;
 using Bank.Application.DTOs.Operations;
 using Bank.Application.Services.Interfaces;
 using Bank.Application.Exceptions;
+using Bank.Application.Common;
 
 namespace Bank.Application.Services.Implementations
 {
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IDataBaseRepository _dbRepository;
         private readonly IOperationTypeRepository _operationTypeRepository;
+        private readonly IOrganizationService _organizationService;
 
         public AccountService(
             IAccountRepository accountRepository,
-            IUserRepository userRepository,
             IDataBaseRepository dbRepository,
-            IOperationTypeRepository operationTypeRepository)
+            IOperationTypeRepository operationTypeRepository,
+            IOrganizationService organizationService)
         {
             _accountRepository = accountRepository;
-            _userRepository = userRepository;
             _dbRepository = dbRepository;
             _operationTypeRepository = operationTypeRepository;
+            _organizationService = organizationService;
+        }
+
+        private async Task<bool> UserMayAccessAccountAsync(Guid userId, Account account)
+        {
+            if (account.UserId.HasValue && account.UserId.Value == userId) return true;
+            if (account.OrganizationId.HasValue)
+                return await _organizationService.UserIsMemberAsync(account.OrganizationId.Value, userId);
+            return false;
+        }
+
+        private async Task EnsureAccessAsync(Guid userId, Account? account)
+        {
+            if (account == null) throw new NotFoundException("Счет не найден");
+            if (!await UserMayAccessAccountAsync(userId, account))
+                throw new BusinessException("Нет доступа к счёту");
         }
 
         private async Task<AccountDto> MapToAccountDto(Account account)
         {
-            var user = await _dbRepository.GetByIdAsync<User>(account.UserId);
+            string ownerName = "Неизвестно";
+            Guid? orgId = null;
+            string? orgName = null;
+
+            if (account.UserId.HasValue)
+            {
+                var user = await _dbRepository.GetByIdAsync<User>(account.UserId.Value);
+                if (user != null) ownerName = user.FullName;
+            }
+
+            if (account.OrganizationId.HasValue)
+            {
+                var org = await _dbRepository.GetByIdAsync<Organization>(account.OrganizationId.Value);
+                if (org != null)
+                {
+                    ownerName = org.Name;
+                    orgId = org.Id;
+                    orgName = org.Name;
+                }
+            }
 
             return new AccountDto
             {
@@ -42,7 +77,9 @@ namespace Bank.Application.Services.Implementations
                 Currency = account.Currency,
                 AccountType = account.AccountType,
                 OpenedAt = account.OpenedAt,
-                OwnerName = user?.FullName ?? "Неизвестно"
+                OwnerName = ownerName,
+                OrganizationId = orgId,
+                OrganizationName = orgName
             };
         }
 
@@ -51,35 +88,67 @@ namespace Bank.Application.Services.Implementations
             return "9112" + DateTime.UtcNow.Ticks.ToString().Substring(0, 10);
         }
 
-        public async Task<AccountDto?> GetByIdAsync(Guid id)
+        public async Task<AccountDto?> GetByIdAsync(Guid id, Guid actingUserId)
         {
             var account = await _dbRepository.GetByIdAsync<Account>(id);
             if (account == null) return null;
+            await EnsureAccessAsync(actingUserId, account);
             return await MapToAccountDto(account);
         }
 
-        public async Task<List<AccountDto>> GetByUserIdAsync(Guid userId)
+        public async Task<List<AccountDto>> GetByUserIdAsync(Guid userId, Guid actingUserId)
         {
-            var accounts = await _accountRepository.GetByUserIdAsync(userId);
-            var result = new List<AccountDto>();
-
-            foreach (var account in accounts)
-            {
-                result.Add(await MapToAccountDto(account));
-            }
-
-            return result;
+            if (userId != actingUserId)
+                throw new BusinessException("Нельзя запрашивать чужие счета");
+            return await GetAccessibleAccountsAsync(actingUserId);
         }
 
-        public async Task<AccountDto> CreateAccountAsync(CreateAccountRequest request)
+        public async Task<List<AccountDto>> GetAccessibleAccountsAsync(Guid actingUserId)
         {
-            var user = await _dbRepository.GetByIdAsync<User>(request.UserId);
-            if (user == null) throw new NotFoundException("Пользователь не найден");
+            var result = new List<AccountDto>();
 
-            var account = new Account
+            foreach (var a in await _accountRepository.GetByUserIdAsync(actingUserId))
+                result.Add(await MapToAccountDto(a));
+
+            var members = await _dbRepository.GetAllAsync<OrganizationMember>();
+            var orgIds = members.Where(m => m.UserId == actingUserId).Select(m => m.OrganizationId).Distinct();
+            foreach (var orgId in orgIds)
+            {
+                foreach (var a in await _accountRepository.GetByOrganizationIdAsync(orgId))
+                    result.Add(await MapToAccountDto(a));
+            }
+
+            return result.OrderBy(x => x.AccountNumber).ToList();
+        }
+
+        public async Task<AccountDto> CreateAccountAsync(CreateAccountRequest request, Guid actingUserId)
+        {
+            if (request.OrganizationId.HasValue)
+            {
+                if (!await _organizationService.UserIsDirectorAsync(request.OrganizationId.Value, actingUserId))
+                    throw new BusinessException("Только директор может открывать корпоративные счета");
+
+                var account = new Account
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = null,
+                    OrganizationId = request.OrganizationId,
+                    AccountNumber = GenerateAccountNumber(),
+                    Balance = 0,
+                    Currency = request.Currency,
+                    AccountType = request.AccountType,
+                    OpenedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _dbRepository.AddAsync(account);
+                return await MapToAccountDto(account);
+            }
+
+            var personal = new Account
             {
                 Id = Guid.NewGuid(),
-                UserId = request.UserId,
+                UserId = actingUserId,
+                OrganizationId = null,
                 AccountNumber = GenerateAccountNumber(),
                 Balance = 0,
                 Currency = request.Currency,
@@ -87,22 +156,21 @@ namespace Bank.Application.Services.Implementations
                 OpenedAt = DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow
             };
-
-            await _dbRepository.AddAsync(account);
-            return await MapToAccountDto(account);
+            await _dbRepository.AddAsync(personal);
+            return await MapToAccountDto(personal);
         }
 
-        public async Task<decimal> GetBalanceAsync(Guid accountId)
+        public async Task<decimal> GetBalanceAsync(Guid accountId, Guid actingUserId)
         {
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
-            if (account == null) throw new NotFoundException("Счет не найден");
-            return account.Balance;
+            await EnsureAccessAsync(actingUserId, account);
+            return account!.Balance;
         }
 
-        public async Task<List<OperationDto>> GetAccountHistoryAsync(Guid accountId, OperationFilterDto filter)
+        public async Task<List<OperationDto>> GetAccountHistoryAsync(Guid accountId, OperationFilterDto filter, Guid actingUserId)
         {
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
-            if (account == null) throw new NotFoundException("Счет не найден");
+            await EnsureAccessAsync(actingUserId, account);
 
             var operations = await _accountRepository.GetOperationsByAccountIdAsync(accountId);
             var result = new List<OperationDto>();
@@ -145,21 +213,18 @@ namespace Bank.Application.Services.Implementations
             result.Sort((a, b) => b.CreatedAt.CompareTo(a.CreatedAt));
 
             if (filter.Limit.HasValue && result.Count > filter.Limit.Value)
-            {
                 result = result.Take(filter.Limit.Value).ToList();
-            }
 
             return result;
         }
 
-        public async Task<OperationDto> DepositAsync(Guid accountId, decimal amount, string description = "Пополнение счета")
+        public async Task<OperationDto> DepositAsync(Guid accountId, decimal amount, Guid actingUserId, string description = "Пополнение счета")
         {
             if (amount <= 0)
                 throw new BusinessException("Сумма должна быть больше 0");
 
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
-            if (account == null)
-                throw new NotFoundException("Счет не найден");
+            await EnsureAccessAsync(actingUserId, account);
 
             var operationType = await _operationTypeRepository.GetByNameAsync("DEPOSIT");
             if (operationType == null)
@@ -168,7 +233,7 @@ namespace Bank.Application.Services.Implementations
             var operation = new AccountOperation
             {
                 Id = Guid.NewGuid(),
-                ToAccountId = account.Id,
+                ToAccountId = account!.Id,
                 Amount = amount,
                 OperationTypeId = operationType.Id,
                 Description = description,
@@ -194,16 +259,15 @@ namespace Bank.Application.Services.Implementations
             };
         }
 
-        public async Task<OperationDto> WithdrawAsync(Guid accountId, decimal amount, string description = "Снятие со счета")
+        public async Task<OperationDto> WithdrawAsync(Guid accountId, decimal amount, Guid actingUserId, string description = "Снятие со счета")
         {
             if (amount <= 0)
                 throw new BusinessException("Сумма должна быть больше 0");
 
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
-            if (account == null)
-                throw new NotFoundException("Счет не найден");
+            await EnsureAccessAsync(actingUserId, account);
 
-            if (account.Balance < amount)
+            if (account!.Balance < amount)
                 throw new BusinessException("Недостаточно средств");
 
             var operationType = await _operationTypeRepository.GetByNameAsync("WITHDRAWAL");
@@ -236,6 +300,52 @@ namespace Bank.Application.Services.Implementations
                 Status = operation.Status,
                 CreatedAt = operation.CreatedAt,
                 FromAccountNumber = account.AccountNumber
+            };
+        }
+
+        public async Task<TransferRecipientPreviewDto?> LookupTransferRecipientAsync(string? accountNumberRaw)
+        {
+            var normalized = AccountNumberNormalizer.NormalizeAccountNumber(accountNumberRaw);
+            if (string.IsNullOrEmpty(normalized)) return null;
+            var account = await _accountRepository.GetByAccountNumberAsync(normalized);
+            if (account == null) return null;
+
+            if (account.OrganizationId.HasValue)
+            {
+                var org = await _dbRepository.GetByIdAsync<Organization>(account.OrganizationId.Value);
+                return new TransferRecipientPreviewDto
+                {
+                    AccountNumber = account.AccountNumber,
+                    Currency = account.Currency,
+                    AccountType = account.AccountType,
+                    RecipientKind = "organization",
+                    DisplayName = org?.Name ?? "Организация",
+                    Inn = org?.Inn,
+                };
+            }
+
+            if (account.UserId.HasValue)
+            {
+                var user = await _dbRepository.GetByIdAsync<User>(account.UserId.Value);
+                return new TransferRecipientPreviewDto
+                {
+                    AccountNumber = account.AccountNumber,
+                    Currency = account.Currency,
+                    AccountType = account.AccountType,
+                    RecipientKind = "individual",
+                    DisplayName = user?.FullName ?? "Физическое лицо",
+                    Inn = null,
+                };
+            }
+
+            return new TransferRecipientPreviewDto
+            {
+                AccountNumber = account.AccountNumber,
+                Currency = account.Currency,
+                AccountType = account.AccountType,
+                RecipientKind = "unknown",
+                DisplayName = "Счёт",
+                Inn = null,
             };
         }
     }

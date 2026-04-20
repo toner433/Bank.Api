@@ -14,10 +14,13 @@ namespace Bank.Domain.Models
         public string PassportNumber { get; set; }
         public DateOnly BirthDate { get; set; }
         public bool IsBlocked { get; set; }
+        /// <summary>Системный администратор банка (отдельный кабинет в приложении).</summary>
+        public bool IsAdmin { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<Account> Accounts { get; set; }
         public ICollection<Session> Sessions { get; set; }
         public ICollection<VerificationCode> VerificationCodes { get; set; }
         public ICollection<Card> Cards { get; set; }
+        public ICollection<OrganizationMember> OrganizationMembers { get; set; } = new List<OrganizationMember>();
     }
 }

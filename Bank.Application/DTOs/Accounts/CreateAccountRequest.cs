@@ -8,8 +8,9 @@ namespace Bank.Application.DTOs.Accounts
 {
     public class CreateAccountRequest
     {
-        public Guid UserId { get; set; }
-        public string Currency { get; set; } = string.Empty;
-        public string AccountType { get; set; } = string.Empty;
+        /// <summary>Если задано — открывается корпоративный счёт (только директор организации).</summary>
+        public Guid? OrganizationId { get; set; }
+        public string Currency { get; set; } = "BYN";
+        public string AccountType { get; set; } = "current";
     }
 }

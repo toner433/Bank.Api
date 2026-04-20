@@ -37,6 +37,10 @@ namespace Bank.API.Controllers
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetByUserId(Guid userId)
         {
+            var uid = User.GetCurrentUserId();
+            if (uid == null) return Unauthorized();
+            if (userId != uid.Value)
+                return BadRequest(new { error = "Можно смотреть только свои карты" });
             var cards = await _cardService.GetByUserIdAsync(userId);
             return Ok(cards);
         }

@@ -12,53 +12,75 @@ import Cards from './pages/Cards';
 import CardDetail from './pages/CardDetail';
 import CreateCard from './pages/CreateCard';
 import Transfer from './pages/Transfer';
+import CreateAccount from './pages/CreateAccount';
+import CorporateList from './pages/CorporateList';
+import CorporateRegister from './pages/CorporateRegister';
+import CorporateOrganization from './pages/CorporateOrganization';
+import Deposits from './pages/Deposits';
+import CorporateOnly from './components/CorporateOnly';
+import AppLayout from './components/AppLayout';
+import AdminLayout from './components/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminOrganizationsPage from './pages/admin/AdminOrganizationsPage';
+import { useAuth } from './context/AuthContext';
 
-
-function App() {
-    const isAuthenticated = !!localStorage.getItem('token');
+function AppRoutes() {
+    const { token } = useAuth();
+    const isAuthenticated = !!token;
 
     return (
+        <Routes>
+            <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
+            <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} />
+
+            <Route element={<AppLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/accounts" element={<Accounts />} />
+                <Route path="/accounts/:id" element={<AccountDetail />} />
+                <Route path="/accounts/create" element={<CreateAccount />} />
+                <Route path="/transfer" element={<Transfer />} />
+                <Route path="/deposits" element={<Deposits />} />
+                <Route path="/cards" element={<Cards />} />
+                <Route path="/cards/create" element={<CreateCard />} />
+                <Route path="/cards/:id" element={<CardDetail />} />
+                <Route path="/profile" element={<Profile />} />
+
+                <Route path="/corporate/register" element={<CorporateRegister />} />
+                <Route
+                    path="/corporate"
+                    element={
+                        <CorporateOnly>
+                            <CorporateList />
+                        </CorporateOnly>
+                    }
+                />
+                <Route
+                    path="/corporate/:orgId"
+                    element={
+                        <CorporateOnly>
+                            <CorporateOrganization />
+                        </CorporateOnly>
+                    }
+                />
+
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="users" element={<AdminUsersPage />} />
+                    <Route path="organizations" element={<AdminOrganizationsPage />} />
+                </Route>
+            </Route>
+
+            <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    );
+}
+
+function App() {
+    return (
         <BrowserRouter>
-            <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route
-                    path="/dashboard"
-                    element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-                />
-                <Route
-                    path="/accounts"
-                    element={isAuthenticated ? <Accounts /> : <Navigate to="/login" />}
-                />
-                <Route
-                    path="/profile"
-                    element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
-                />
-                <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
-                <Route
-                    path="/accounts/:id"
-                    element={isAuthenticated ? <AccountDetail /> : <Navigate to="/login" />}
-                />
-              
-                <Route
-                    path="/transfer"
-                    element={isAuthenticated ? <Transfer /> : <Navigate to="/login" />}
-                />
-                <Route
-                    path="/cards/:id"
-                    element={isAuthenticated ? <CardDetail /> : <Navigate to="/login" />}
-                />
-           
-                <Route
-                    path="/cards/create"
-                    element={isAuthenticated ? <CreateCard /> : <Navigate to="/login" />}
-                />
-              
-                <Route
-                    path="/cards"
-                    element={isAuthenticated ? <Cards /> : <Navigate to="/login" />}
-                />
-            </Routes>
+            <AppRoutes />
         </BrowserRouter>
     );
 }

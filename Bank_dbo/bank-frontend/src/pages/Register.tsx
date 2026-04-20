@@ -1,6 +1,8 @@
 ﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { parseAuthResponse } from '../utils/parseAuthResponse';
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +17,7 @@ const Register: React.FC = () => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
+    const { setSession } = useAuth();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -46,10 +49,15 @@ const Register: React.FC = () => {
                 birthDate: formData.birthDate
             };
 
-            await authApi.register(requestData);
-            setSuccess('Регистрация успешна!');
+            const res = await authApi.register(requestData);
+            const auth = parseAuthResponse(res.data);
+            if (auth) {
+                await setSession(auth.token, auth.userId, auth.isAdmin);
+                navigate('/dashboard', { replace: true });
+                return;
+            }
+            setSuccess('Регистрация успешна! Войдите в систему.');
             setTimeout(() => navigate('/login'), 2000);
-
         } catch (err: any) {
             console.log('Ошибка:', err.response?.data);
 
@@ -89,7 +97,14 @@ const Register: React.FC = () => {
                         <div className="col-md-8">
                             <div className="card">
                                 <div className="card-header">
-                                    <h2>Регистрация</h2>
+                                    <h2>Регистрация физического лица</h2>
+                                </div>
+                                <div className="p-3 pb-0">
+                                    <p className="text-muted small mb-0">
+                                        Здесь создаётся личный аккаунт в банке (логин, паспорт, контакты). Для юрлица после
+                                        входа откройте раздел «Для бизнеса» → «Зарегистрировать организацию» — это отдельная
+                                        запись с ИНН и ролями (директор / бухгалтер).
+                                    </p>
                                 </div>
 
                                 {errors.form && (

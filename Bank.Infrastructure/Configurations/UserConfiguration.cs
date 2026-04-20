@@ -52,6 +52,10 @@ namespace Bank.Infrastructure.Configurations
                 .HasColumnName("is_blocked")
                 .HasDefaultValue(false);
 
+            builder.Property(x => x.IsAdmin)
+                .HasColumnName("is_admin")
+                .HasDefaultValue(false);
+
             builder.Property(x => x.CreatedAt)
                 .HasColumnName("created_at")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");

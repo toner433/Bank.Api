@@ -15,5 +15,7 @@ namespace Bank.Application.DTOs.Accounts
         public string AccountType { get; set; } = string.Empty;
         public DateTime OpenedAt { get; set; }
         public string OwnerName { get; set; } = string.Empty;
+        public Guid? OrganizationId { get; set; }
+        public string? OrganizationName { get; set; }
     }
 }

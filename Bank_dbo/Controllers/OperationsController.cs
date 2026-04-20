@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Threading.Tasks;
 using Bank.Application.Services.Interfaces;
 using OperationFilterDto = Bank.Application.DTOs.Operations.OperationFilterDto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]  
+    [Authorize]
     public class OperationsController : ControllerBase
     {
         private readonly IOperationService _operationService;
@@ -17,13 +19,18 @@ namespace Bank.API.Controllers
             _operationService = operationService;
         }
 
-        [HttpGet("user/{userId}")]
+        [HttpGet("user/{userId:guid}")]
         public async Task<IActionResult> GetUserOperations(
             Guid userId,
             [FromQuery] DateTime? fromDate,
             [FromQuery] DateTime? toDate,
             [FromQuery] int? limit)
         {
+            var uid = User.GetCurrentUserId();
+            if (uid == null) return Unauthorized();
+            if (userId != uid.Value)
+                return BadRequest(new { error = "Можно смотреть только свои операции" });
+
             var filter = new OperationFilterDto
             {
                 FromDate = fromDate,
@@ -35,7 +42,33 @@ namespace Bank.API.Controllers
             return Ok(operations);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("organization/{organizationId:guid}")]
+        public async Task<IActionResult> GetOrganizationOperations(
+            Guid organizationId,
+            [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate,
+            [FromQuery] int? limit)
+        {
+            var uid = User.GetCurrentUserId();
+            if (uid == null) return Unauthorized();
+            var filter = new OperationFilterDto
+            {
+                FromDate = fromDate,
+                ToDate = toDate,
+                Limit = limit
+            };
+            try
+            {
+                var operations = await _operationService.GetOrganizationOperationsAsync(organizationId, uid.Value, filter);
+                return Ok(operations);
+            }
+            catch (Bank.Application.Exceptions.BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var operation = await _operationService.GetOperationByIdAsync(id);

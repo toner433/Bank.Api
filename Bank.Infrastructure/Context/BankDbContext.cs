@@ -23,6 +23,10 @@ namespace Bank.Infrastructure.Context
         public DbSet<OperationType> OperationTypes => Set<OperationType>();
         public DbSet<Session> Sessions => Set<Session>();
         public DbSet<VerificationCode> VerificationCodes => Set<VerificationCode>();
+        public DbSet<Organization> Organizations => Set<Organization>();
+        public DbSet<OrganizationMember> OrganizationMembers => Set<OrganizationMember>();
+        public DbSet<PaymentOrder> PaymentOrders => Set<PaymentOrder>();
+        public DbSet<TimeDeposit> TimeDeposits => Set<TimeDeposit>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -36,6 +40,10 @@ namespace Bank.Infrastructure.Context
             modelBuilder.ApplyConfiguration(new VerificationCodeConfiguration());
             modelBuilder.ApplyConfiguration(new CardConfiguration());
             modelBuilder.ApplyConfiguration(new CardOperationConfiguration());
+            modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
+            modelBuilder.ApplyConfiguration(new OrganizationMemberConfiguration());
+            modelBuilder.ApplyConfiguration(new PaymentOrderConfiguration());
+            modelBuilder.ApplyConfiguration(new TimeDepositConfiguration());
         }
     }
 }

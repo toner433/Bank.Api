@@ -10,6 +10,7 @@ namespace Bank.Domain.Interfaces
     public interface IAccountRepository
     {
         Task<List<Account>> GetByUserIdAsync(Guid userId);
+        Task<List<Account>> GetByOrganizationIdAsync(Guid organizationId);
         Task<Account?> GetByAccountNumberAsync(string accountNumber);
         Task<AccountOperation?> GetOperationByIdAsync(Guid id);
         Task<List<AccountOperation>> GetOperationsByAccountIdAsync(Guid accountId);
