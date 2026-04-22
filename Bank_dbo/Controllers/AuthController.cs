@@ -46,5 +46,35 @@ namespace Bank.API.Controllers
                 return Unauthorized(new { error = ex.Message });
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost("password-reset/request")]
+        public async Task<IActionResult> RequestPasswordReset(RequestPasswordResetRequest request)
+        {
+            try
+            {
+                await _userService.RequestPasswordResetAsync(request);
+                return Ok(new { message = "Если email существует, код отправлен на почту" });
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("password-reset/confirm")]
+        public async Task<IActionResult> ConfirmPasswordReset(ConfirmPasswordResetRequest request)
+        {
+            try
+            {
+                await _userService.ConfirmPasswordResetAsync(request);
+                return Ok(new { message = "Пароль успешно изменен" });
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }

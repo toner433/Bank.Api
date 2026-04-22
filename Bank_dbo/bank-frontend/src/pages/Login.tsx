@@ -9,6 +9,14 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showReset, setShowReset] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetCode, setResetCode] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [resetMessage, setResetMessage] = useState('');
+    const [resetError, setResetError] = useState('');
+    const [resetLoading, setResetLoading] = useState(false);
     const navigate = useNavigate();
     const { setSession } = useAuth();
 
@@ -44,6 +52,44 @@ const Login: React.FC = () => {
             }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleRequestReset = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setResetError('');
+        setResetMessage('');
+        setResetLoading(true);
+        try {
+            await authApi.requestPasswordReset({ email: resetEmail });
+            setResetMessage('Код отправлен на почту (если email зарегистрирован).');
+        } catch (err: any) {
+            setResetError(err.response?.data?.error || 'Не удалось отправить код');
+        } finally {
+            setResetLoading(false);
+        }
+    };
+
+    const handleConfirmReset = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setResetError('');
+        setResetMessage('');
+        setResetLoading(true);
+        try {
+            await authApi.confirmPasswordReset({
+                email: resetEmail,
+                code: resetCode,
+                newPassword,
+                confirmPassword,
+            });
+            setResetMessage('Пароль изменен. Теперь войдите с новым паролем.');
+            setResetCode('');
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (err: any) {
+            setResetError(err.response?.data?.error || 'Не удалось сменить пароль');
+        } finally {
+            setResetLoading(false);
         }
     };
 
@@ -110,6 +156,84 @@ const Login: React.FC = () => {
                         Нет аккаунта? Зарегистрироваться
                     </Link>
                 </div>
+                <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
+                    <button
+                        type="button"
+                        className="btn btn--ghost btn--sm"
+                        onClick={() => {
+                            setShowReset((v) => !v);
+                            setResetError('');
+                            setResetMessage('');
+                        }}
+                    >
+                        {showReset ? 'Скрыть восстановление пароля' : 'Забыли пароль?'}
+                    </button>
+                </div>
+                {showReset && (
+                    <div className="container" style={{ marginTop: '1rem', maxWidth: '32rem' }}>
+                        <div className="card">
+                            <div className="card-header">
+                                <h3>Восстановление пароля</h3>
+                            </div>
+                            {resetError && <div className="alert alert-danger m-3">{resetError}</div>}
+                            {resetMessage && (
+                                <div className="alert m-3" style={{ background: '#d4edda', borderColor: '#c3e6cb', color: '#155724' }}>
+                                    {resetMessage}
+                                </div>
+                            )}
+                            <form onSubmit={handleRequestReset} className="p-3 border-bottom">
+                                <div className="form-group">
+                                    <label className="form-label">Email аккаунта</label>
+                                    <input
+                                        type="email"
+                                        className="form-input"
+                                        value={resetEmail}
+                                        onChange={(e) => setResetEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-block" disabled={resetLoading}>
+                                    {resetLoading ? 'Отправка…' : 'Отправить код на почту'}
+                                </button>
+                            </form>
+                            <form onSubmit={handleConfirmReset} className="p-3">
+                                <div className="form-group">
+                                    <label className="form-label">Код из письма</label>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        value={resetCode}
+                                        onChange={(e) => setResetCode(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Новый пароль</label>
+                                    <input
+                                        type="password"
+                                        className="form-input"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Подтверждение пароля</label>
+                                    <input
+                                        type="password"
+                                        className="form-input"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-block" disabled={resetLoading}>
+                                    {resetLoading ? 'Смена…' : 'Сбросить пароль'}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
                 <p className="text-muted small" style={{ textAlign: 'center', marginTop: '1.5rem', maxWidth: '28rem', marginLeft: 'auto', marginRight: 'auto' }}>
                     Тестовый администратор: логин <strong>bankadmin</strong>, пароль <strong>Admin123!</strong> (только для разработки).
                 </p>

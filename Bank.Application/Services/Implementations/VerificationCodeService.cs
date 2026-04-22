@@ -5,6 +5,9 @@ using Bank.Domain.Models;
 using Bank.Application.DTOs.Verification;
 using Bank.Application.Services.Interfaces;
 using Bank.Application.Exceptions;
+using Microsoft.Extensions.Configuration;
+using System.Net;
+using System.Net.Mail;
 
 namespace Bank.Application.Services.Implementations
 {
@@ -12,13 +15,16 @@ namespace Bank.Application.Services.Implementations
     {
         private readonly IAuthRepository _authRepository;
         private readonly IDataBaseRepository _dbRepository;
+        private readonly IConfiguration _configuration;
 
         public VerificationCodeService(
             IAuthRepository authRepository,
-            IDataBaseRepository dbRepository)
+            IDataBaseRepository dbRepository,
+            IConfiguration configuration)
         {
             _authRepository = authRepository;
             _dbRepository = dbRepository;
+            _configuration = configuration;
         }
 
         private string GenerateRandomCode()
@@ -84,7 +90,37 @@ namespace Bank.Application.Services.Implementations
         {
             try
             {
-                Console.WriteLine($"Email отправлено на {email}: Ваш код {code}");
+                var host = _configuration["Smtp:Host"];
+                var portRaw = _configuration["Smtp:Port"];
+                var username = _configuration["Smtp:Username"];
+                var password = _configuration["Smtp:Password"];
+                var from = _configuration["Smtp:From"] ?? username;
+                var sslRaw = _configuration["Smtp:UseSsl"];
+
+                if (!string.IsNullOrWhiteSpace(host)
+                    && !string.IsNullOrWhiteSpace(portRaw)
+                    && int.TryParse(portRaw, out var port)
+                    && !string.IsNullOrWhiteSpace(from))
+                {
+                    using var client = new SmtpClient(host, port)
+                    {
+                        EnableSsl = !string.Equals(sslRaw, "false", StringComparison.OrdinalIgnoreCase),
+                    };
+
+                    if (!string.IsNullOrWhiteSpace(username))
+                        client.Credentials = new NetworkCredential(username, password);
+
+                    using var msg = new MailMessage(from, email)
+                    {
+                        Subject = "Сброс пароля D-bank",
+                        Body = $"Ваш код для сброса пароля: {code}. Код действует 10 минут."
+                    };
+                    await client.SendMailAsync(msg);
+                }
+                else
+                {
+                    Console.WriteLine($"Email отправлено на {email}: Ваш код {code}");
+                }
                 return await Task.FromResult(true);
             }
             catch

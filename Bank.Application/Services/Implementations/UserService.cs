@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Bank.Domain.Interfaces;
 using Bank.Domain.Models;
@@ -16,15 +17,18 @@ namespace Bank.Application.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly IAuthRepository _authRepository;
         private readonly IDataBaseRepository _dbRepository;
+        private readonly IVerificationCodeService _verificationCodeService;
 
         public UserService(
             IUserRepository userRepository,
             IAuthRepository authRepository,
-            IDataBaseRepository dbRepository)
+            IDataBaseRepository dbRepository,
+            IVerificationCodeService verificationCodeService)
         {
             _userRepository = userRepository;
             _authRepository = authRepository;
             _dbRepository = dbRepository;
+            _verificationCodeService = verificationCodeService;
         }
         private UserDto MapToUserDto(User user)
         {
@@ -189,6 +193,65 @@ namespace Bank.Application.Services.Implementations
         {
             return await _userRepository.ExistsAsync(login);
         }
-       
+
+        public async Task RequestPasswordResetAsync(RequestPasswordResetRequest request)
+        {
+            var email = (request.Email ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                throw new BusinessException("Укажите email");
+
+            var users = await _dbRepository.GetAllAsync<User>();
+            var user = users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
+
+            if (user == null)
+                return;
+
+            var code = new VerificationCode
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Code = new Random().Next(100000, 999999).ToString(),
+                Purpose = "PASSWORD_RESET",
+                IsUsed = false,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(10)
+            };
+
+            await _dbRepository.AddAsync(code);
+            await _verificationCodeService.SendCodeByEmailAsync(user.Email, code.Code);
+        }
+
+        public async Task<bool> ConfirmPasswordResetAsync(ConfirmPasswordResetRequest request)
+        {
+            var email = (request.Email ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                throw new BusinessException("Укажите email");
+
+            var users = await _dbRepository.GetAllAsync<User>();
+            var user = users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
+            if (user == null)
+                throw new BusinessException("Неверный код или email");
+
+            if (request.NewPassword.Length < 6)
+                throw new BusinessException("Пароль должен быть минимум 6 символов");
+
+            if (request.NewPassword != request.ConfirmPassword)
+                throw new BusinessException("Новый пароль и подтверждение не совпадают");
+
+            var isValidCode = await _verificationCodeService.VerifyCodeAsync(new DTOs.Verification.VerifyCodeRequest
+            {
+                UserId = user.Id,
+                Purpose = "PASSWORD_RESET",
+                Code = (request.Code ?? string.Empty).Trim()
+            });
+
+            if (!isValidCode)
+                throw new BusinessException("Неверный код или email");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await _dbRepository.UpdateAsync(user);
+            return true;
+        }
+
     }
 }

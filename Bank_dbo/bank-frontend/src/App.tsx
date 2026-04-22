@@ -26,41 +26,49 @@ import AdminOrganizationsPage from './pages/admin/AdminOrganizationsPage';
 import { useAuth } from './context/AuthContext';
 
 function AppRoutes() {
-    const { token } = useAuth();
+    const { token, isAdmin } = useAuth();
     const isAuthenticated = !!token;
 
     return (
         <Routes>
-            <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
-            <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} />
+            <Route path="/login" element={isAuthenticated ? <Navigate to={isAdmin ? '/admin' : '/dashboard'} replace /> : <Login />} />
+            <Route path="/register" element={isAuthenticated ? <Navigate to={isAdmin ? '/admin' : '/dashboard'} replace /> : <Register />} />
 
             <Route element={<AppLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/accounts" element={<Accounts />} />
-                <Route path="/accounts/:id" element={<AccountDetail />} />
-                <Route path="/accounts/create" element={<CreateAccount />} />
-                <Route path="/transfer" element={<Transfer />} />
-                <Route path="/deposits" element={<Deposits />} />
-                <Route path="/cards" element={<Cards />} />
-                <Route path="/cards/create" element={<CreateCard />} />
-                <Route path="/cards/:id" element={<CardDetail />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/dashboard" element={isAdmin ? <Navigate to="/admin" replace /> : <Dashboard />} />
+                <Route path="/accounts" element={isAdmin ? <Navigate to="/admin" replace /> : <Accounts />} />
+                <Route path="/accounts/:id" element={isAdmin ? <Navigate to="/admin" replace /> : <AccountDetail />} />
+                <Route path="/accounts/create" element={isAdmin ? <Navigate to="/admin" replace /> : <CreateAccount />} />
+                <Route path="/transfer" element={isAdmin ? <Navigate to="/admin" replace /> : <Transfer />} />
+                <Route path="/deposits" element={isAdmin ? <Navigate to="/admin" replace /> : <Deposits />} />
+                <Route path="/cards" element={isAdmin ? <Navigate to="/admin" replace /> : <Cards />} />
+                <Route path="/cards/create" element={isAdmin ? <Navigate to="/admin" replace /> : <CreateCard />} />
+                <Route path="/cards/:id" element={isAdmin ? <Navigate to="/admin" replace /> : <CardDetail />} />
+                <Route path="/profile" element={isAdmin ? <Navigate to="/admin" replace /> : <Profile />} />
 
-                <Route path="/corporate/register" element={<CorporateRegister />} />
+                <Route path="/corporate/register" element={isAdmin ? <Navigate to="/admin" replace /> : <CorporateRegister />} />
                 <Route
                     path="/corporate"
                     element={
-                        <CorporateOnly>
-                            <CorporateList />
-                        </CorporateOnly>
+                        isAdmin ? (
+                            <Navigate to="/admin" replace />
+                        ) : (
+                            <CorporateOnly>
+                                <CorporateList />
+                            </CorporateOnly>
+                        )
                     }
                 />
                 <Route
                     path="/corporate/:orgId"
                     element={
-                        <CorporateOnly>
-                            <CorporateOrganization />
-                        </CorporateOnly>
+                        isAdmin ? (
+                            <Navigate to="/admin" replace />
+                        ) : (
+                            <CorporateOnly>
+                                <CorporateOrganization />
+                            </CorporateOnly>
+                        )
                     }
                 />
 
@@ -71,7 +79,7 @@ function AppRoutes() {
                 </Route>
             </Route>
 
-            <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
+            <Route path="/" element={<Navigate to={isAuthenticated ? (isAdmin ? '/admin' : '/dashboard') : '/login'} replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );

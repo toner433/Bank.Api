@@ -17,5 +17,7 @@ namespace Bank.Application.Services.Interfaces
         Task<UserDto> UpdateProfileAsync(Guid userId, UpdateProfileRequest request);
         Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordRequest request);
         Task<bool> ExistsAsync(string login);
+        Task RequestPasswordResetAsync(RequestPasswordResetRequest request);
+        Task<bool> ConfirmPasswordResetAsync(ConfirmPasswordResetRequest request);
     }
 }
