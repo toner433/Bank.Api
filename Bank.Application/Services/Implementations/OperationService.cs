@@ -57,14 +57,14 @@ namespace Bank.Application.Services.Implementations
             if (!await UserMayAccessAccountAsync(actingUserId, fromAccount))
                 throw new BusinessException("Нет прав на счёт списания");
 
-            if (string.Equals(fromAccount.AccountType, "time_deposit", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(fromAccount.AccountType, "time_deposit", StringComparison.OrdinalIgnoreCase)
+                && !request.AllowFromTimeDeposit)
                 throw new BusinessException(
                     "Со счёта срочного вклада нельзя переводить напрямую. Закройте вклад на странице «Вклады» или выберите текущий счёт.");
 
             if (fromAccount.Id == toAccount.Id)
                 throw new BusinessException("Нельзя перевести на тот же счёт");
 
-            // При переводе по номеру счёта на юрлицо требуем ИНН (как в платёжке). По ToAccountId — доверенный внутренний вызов.
             if (toAccount.OrganizationId.HasValue && !request.ToAccountId.HasValue)
             {
                 var innFromUser = AccountNumberNormalizer.InnDigitsOnly(request.RecipientInn);
@@ -79,11 +79,28 @@ namespace Bank.Application.Services.Implementations
                     throw new BusinessException("ИНН не совпадает с владельцем счёта получателя. Проверьте номер счёта и ИНН.");
             }
 
-            if (fromAccount.Balance < request.Amount) throw new BusinessException("Недостаточно средств");
-            if (fromAccount.Currency != toAccount.Currency) throw new BusinessException("Валюты счетов не совпадают");
+            if (request.Amount <= 0)
+                throw new BusinessException("Сумма перевода должна быть больше 0");
 
-            var operationType = await _operationTypeRepository.GetByNameAsync("TRANSFER");
-            if (operationType == null) throw new BusinessException("Тип операции не найден");
+            if (fromAccount.Balance < request.Amount)
+                throw new BusinessException("Недостаточно средств");
+
+            if (fromAccount.Currency != toAccount.Currency)
+                throw new BusinessException($"Валюты счетов не совпадают: {fromAccount.Currency} -> {toAccount.Currency}");
+
+            var operationType = await _operationTypeRepository.GetByNameAsync("TRANSFER")
+                ?? await _operationTypeRepository.GetByNameAsync("Transfer")
+                ?? await _operationTypeRepository.GetByNameAsync("transfer");
+
+            if (operationType == null)
+            {
+                operationType = new OperationType
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "TRANSFER"
+                };
+                await _dbRepository.AddAsync(operationType);
+            }
 
             var operation = new AccountOperation
             {
@@ -92,7 +109,7 @@ namespace Bank.Application.Services.Implementations
                 ToAccountId = toAccount.Id,
                 Amount = request.Amount,
                 OperationTypeId = operationType.Id,
-                Description = request.Description,
+                Description = string.IsNullOrWhiteSpace(request.Description) ? "Перевод" : request.Description.Trim(),
                 Status = "Completed",
                 CreatedAt = DateTime.UtcNow,
                 CompletedAt = DateTime.UtcNow

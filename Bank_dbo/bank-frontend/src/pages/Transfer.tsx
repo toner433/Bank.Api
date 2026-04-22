@@ -270,13 +270,13 @@ const Transfer: React.FC = () => {
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Назначение платежа</label>
+                                <label className="form-label">Назначение платежа (необязательно)</label>
                                 <input
                                     type="text"
                                     className="form-input"
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="Перевод"
+                                    placeholder="Можно оставить пустым"
                                 />
                             </div>
 

@@ -2,6 +2,14 @@
 import { Link } from 'react-router-dom';
 import { accountApi } from '../services/api';
 
+const accountTypeLabel = (accountType: string) => {
+    const normalized = String(accountType || '').toLowerCase();
+    if (normalized === 'debit') return 'Текущий';
+    if (normalized === 'time_deposit') return 'Срочный вклад';
+    if (normalized === 'corporate_current') return 'Корпоративный счёт';
+    return accountType || 'Счёт';
+};
+
 const Accounts: React.FC = () => {
     const [accounts, setAccounts] = useState<any[]>([]);
 
@@ -40,13 +48,9 @@ const Accounts: React.FC = () => {
                         <div className="card h-100">
                             <div className="card-header">
                                 <h3>
-                                    {account.organizationName ? `Корп.: ${account.organizationName}` : 'Личный счёт'}
+                                    {account.organizationName ? `Организация: ${account.organizationName}` : 'Личный счёт'}
                                     {' · '}
-                                    {account.accountType === 'Debit'
-                                        ? 'Текущий'
-                                        : account.accountType === 'time_deposit'
-                                          ? 'Вклад'
-                                          : account.accountType}
+                                    {accountTypeLabel(account.accountType)}
                                 </h3>
                             </div>
 

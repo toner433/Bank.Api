@@ -13,7 +13,7 @@ namespace Bank.Application.DTOs.Accounts
         public string? ToAccountNumber { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; } = string.Empty;
-        /// <summary>Обязателен при переводе на счёт юрлица: должен совпадать с ИНН организации-владельца счёта.</summary>
         public string? RecipientInn { get; set; }
+        public bool AllowFromTimeDeposit { get; set; }
     }
 }

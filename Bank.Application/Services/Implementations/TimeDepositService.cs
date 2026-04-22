@@ -184,7 +184,8 @@ namespace Bank.Application.Services.Implementations
                 FromAccountId = td.DepositAccountId,
                 ToAccountId = request.TargetAccountId,
                 Amount = total,
-                Description = "Возврат вклада и процентов"
+                Description = "Возврат вклада и процентов",
+                AllowFromTimeDeposit = true
             }, actingUserId);
 
             td.Status = "Closed";
