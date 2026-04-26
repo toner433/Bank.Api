@@ -24,6 +24,9 @@ const AdminLayout: React.FC = () => {
                     <NavLink to="/admin/organizations" className={subNav}>
                         Организации
                     </NavLink>
+                    <NavLink to="/admin/accounts" className={subNav}>
+                        Счета
+                    </NavLink>
                 </nav>
             </div>
             <Outlet />

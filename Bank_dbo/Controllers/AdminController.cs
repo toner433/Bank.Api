@@ -81,6 +81,26 @@ namespace Bank.API.Controllers
             }
         }
 
+        [HttpGet("accounts")]
+        public async Task<IActionResult> Accounts()
+        {
+            var uid = CurrentUserId;
+            if (uid == null) return Unauthorized();
+            try
+            {
+                var list = await _adminService.ListAccountsAsync(uid.Value);
+                return Ok(list);
+            }
+            catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))
+            {
+                return Forbid();
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         [HttpPost("users/{id:guid}/block")]
         public async Task<IActionResult> BlockUser(Guid id)
         {
@@ -113,6 +133,78 @@ namespace Bank.API.Controllers
             try
             {
                 await _adminService.SetUserBlockedAsync(uid.Value, id, false);
+                return Ok(new { success = true });
+            }
+            catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))
+            {
+                return Forbid();
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("accounts/{id:guid}/block")]
+        public async Task<IActionResult> BlockAccount(Guid id)
+        {
+            var uid = CurrentUserId;
+            if (uid == null) return Unauthorized();
+            try
+            {
+                await _adminService.SetAccountBlockedAsync(uid.Value, id, true);
+                return Ok(new { success = true });
+            }
+            catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))
+            {
+                return Forbid();
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("accounts/{id:guid}/unblock")]
+        public async Task<IActionResult> UnblockAccount(Guid id)
+        {
+            var uid = CurrentUserId;
+            if (uid == null) return Unauthorized();
+            try
+            {
+                await _adminService.SetAccountBlockedAsync(uid.Value, id, false);
+                return Ok(new { success = true });
+            }
+            catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))
+            {
+                return Forbid();
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [HttpPut("accounts/{id:guid}")]
+        public async Task<IActionResult> UpdateAccount(Guid id, [FromBody] Bank.Application.DTOs.Admin.UpdateAdminAccountRequest request)
+        {
+            var uid = CurrentUserId;
+            if (uid == null) return Unauthorized();
+            try
+            {
+                await _adminService.UpdateAccountAsync(uid.Value, id, request);
                 return Ok(new { success = true });
             }
             catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))

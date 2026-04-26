@@ -43,6 +43,14 @@ namespace Bank.Infrastructure.Configurations
                 .HasMaxLength(30)
                 .HasDefaultValue("current");
 
+            builder.Property(x => x.IsBlocked)
+                .HasColumnName("is_blocked")
+                .HasDefaultValue(false);
+
+            builder.Property(x => x.AdminComment)
+                .HasColumnName("admin_comment")
+                .HasMaxLength(500);
+
             builder.Property(x => x.OpenedAt)
                 .HasColumnName("opened_date")
                 .HasDefaultValueSql("CURRENT_DATE");

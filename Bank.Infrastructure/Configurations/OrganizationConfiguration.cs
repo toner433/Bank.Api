@@ -16,6 +16,7 @@ namespace Bank.Infrastructure.Configurations
             builder.HasIndex(x => x.Inn).IsUnique();
             builder.Property(x => x.Kpp).HasColumnName("kpp").HasMaxLength(9);
             builder.Property(x => x.LegalAddress).HasColumnName("legal_address").HasMaxLength(500).IsRequired();
+            builder.Property(x => x.PublicKeyPem).HasColumnName("public_key_pem");
             builder.Property(x => x.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
         }
     }

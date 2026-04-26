@@ -45,6 +45,8 @@ builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IPaymentOrderService, PaymentOrderService>();
 builder.Services.AddScoped<ITimeDepositService, TimeDepositService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
+builder.Services.AddScoped<IElectronicSignatureService, MockElectronicSignatureService>();
 
 builder.Services.AddAuthentication(options =>
 {

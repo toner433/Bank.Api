@@ -82,10 +82,11 @@ export const operationApi = {
     getUserOperations: (userId: string, params?: any) => api.get(`/Operations/user/${userId}`, { params }),
     getOrganizationOperations: (organizationId: string, params?: any) =>
         api.get(`/Operations/organization/${organizationId}`, { params }),
+    downloadReceiptPdf: (id: string) => api.get(`/Operations/${id}/receipt.pdf`, { responseType: 'blob' }),
 };
 
 export const organizationApi = {
-    register: (data: { name: string; inn: string; kpp?: string; legalAddress: string }) =>
+    register: (data: { name: string; inn: string; kpp?: string; legalAddress: string; publicKeyPem?: string }) =>
         api.post('/Organizations/register', data),
     my: () => api.get('/Organizations/my'),
     get: (id: string) => api.get(`/Organizations/${id}`),
@@ -98,22 +99,38 @@ export const paymentOrderApi = {
     create: (data: {
         organizationId: string;
         fromAccountId: string;
+        documentNumber?: string;
+        documentDate?: string;
         amount: number;
         recipientName: string;
         recipientInn?: string;
+        recipientKpp?: string;
         recipientAccountNumber?: string;
+        recipientBankName?: string;
+        recipientBankBik?: string;
+        paymentPriority?: number;
+        paymentType?: string;
+        vatType?: string;
+        vatAmount?: number;
         purpose: string;
     }) => api.post('/PaymentOrders', data),
     listByOrganization: (organizationId: string) => api.get(`/PaymentOrders/organization/${organizationId}`),
-    execute: (id: string) => api.post(`/PaymentOrders/${id}/execute`),
+    sign: (id: string, data: { deviceDetected: boolean; signatureValue: string; certificateThumbprint?: string }) =>
+        api.post(`/PaymentOrders/${id}/sign`, data),
+    execute: (id: string, data: { deviceDetected: boolean }) => api.post(`/PaymentOrders/${id}/execute`, data),
+    downloadDocumentPdf: (id: string) => api.get(`/PaymentOrders/${id}/document.pdf`, { responseType: 'blob' }),
 };
 
 export const adminApi = {
     stats: () => api.get('/Admin/stats'),
     users: () => api.get('/Admin/users'),
     organizations: () => api.get('/Admin/organizations'),
+    accounts: () => api.get('/Admin/accounts'),
     blockUser: (id: string) => api.post(`/Admin/users/${id}/block`),
     unblockUser: (id: string) => api.post(`/Admin/users/${id}/unblock`),
+    blockAccount: (id: string) => api.post(`/Admin/accounts/${id}/block`),
+    unblockAccount: (id: string) => api.post(`/Admin/accounts/${id}/unblock`),
+    updateAccount: (id: string, data: { adminComment?: string; balance?: number; currency?: string; accountType?: string; isBlocked?: boolean }) => api.put(`/Admin/accounts/${id}`, data),
 };
 
 export const depositApi = {

@@ -7,6 +7,7 @@ import {
     depositApi,
     operationApi,
 } from '../services/api';
+import { buildSignPayload, signPayload, hasPrivateKey } from '../utils/ecdsaSign';
 
 const CorporateOrganization: React.FC = () => {
     const { orgId } = useParams<{ orgId: string }>();
@@ -22,12 +23,25 @@ const CorporateOrganization: React.FC = () => {
     const [newAccCurrency, setNewAccCurrency] = useState('BYN');
     const [poForm, setPoForm] = useState({
         fromAccountId: '',
+        documentNumber: '',
+        documentDate: '',
         amount: '',
         recipientName: '',
         recipientInn: '',
         recipientAccountNumber: '',
+        recipientBankName: '',
+        recipientBankBik: '',
         purpose: '',
     });
+    const [signatureForm, setSignatureForm] = useState({ signatureValue: '', certificateThumbprint: '', deviceDetected: false });
+
+    const handleSignatureChange = (value: string) => {
+        setSignatureForm(prev => ({
+            ...prev,
+            signatureValue: value,
+            deviceDetected: value.trim().length >= 10,
+        }));
+    };
     const [depForm, setDepForm] = useState({ fromAccountId: '', amount: '', termMonths: 6 });
 
     const load = useCallback(async () => {
@@ -97,13 +111,28 @@ const CorporateOrganization: React.FC = () => {
             await paymentOrderApi.create({
                 organizationId: orgId,
                 fromAccountId: poForm.fromAccountId,
+                documentNumber: poForm.documentNumber || undefined,
+                documentDate: poForm.documentDate || undefined,
                 amount: Number(poForm.amount),
                 recipientName: poForm.recipientName,
                 recipientInn: poForm.recipientInn || undefined,
                 recipientAccountNumber: poForm.recipientAccountNumber || undefined,
+                recipientBankName: poForm.recipientBankName || undefined,
+                recipientBankBik: poForm.recipientBankBik || undefined,
+                paymentPriority: 5,
                 purpose: poForm.purpose,
             });
-            setPoForm({ ...poForm, amount: '', purpose: '' });
+            setPoForm({
+                ...poForm,
+                documentNumber: '',
+                amount: '',
+                recipientName: '',
+                recipientInn: '',
+                recipientAccountNumber: '',
+                recipientBankName: '',
+                recipientBankBik: '',
+                purpose: '',
+            });
             await load();
         } catch (e: any) {
             setError(e.response?.data?.error || 'Ошибка');
@@ -112,10 +141,77 @@ const CorporateOrganization: React.FC = () => {
 
     const executeOrder = async (id: string) => {
         try {
-            await paymentOrderApi.execute(id);
+            await paymentOrderApi.execute(id, { deviceDetected: true });
             await load();
         } catch (e: any) {
             setError(e.response?.data?.error || 'Ошибка исполнения');
+        }
+    };
+
+    const signOrder = async (id: string) => {
+        if (!orgId) return;
+        try {
+            const order = orders.find((o: any) => o.id === id);
+            if (!order) { setError('Поручение не найдено'); return; }
+
+            let sigValue = signatureForm.signatureValue;
+            let deviceOk = signatureForm.deviceDetected;
+
+            if (hasPrivateKey(orgId)) {
+                const payload = buildSignPayload({
+                    id: order.id,
+                    amount: order.amount,
+                    recipientName: order.recipientName,
+                    recipientAccountNumber: order.recipientAccountNumber,
+                    purpose: order.purpose,
+                });
+                sigValue = await signPayload(orgId, payload);
+                deviceOk = true;
+            }
+
+            if (!sigValue || sigValue.trim().length < 10) {
+                setError('Введите подпись ЭЦП (минимум 10 символов)');
+                return;
+            }
+
+            await paymentOrderApi.sign(id, {
+                deviceDetected: deviceOk,
+                signatureValue: sigValue,
+                certificateThumbprint: signatureForm.certificateThumbprint || undefined,
+            });
+            await load();
+        } catch (e: any) {
+            const msg = e.response?.data?.error || e.message || 'Ошибка подписи';
+            setError(msg);
+        }
+    };
+
+    const downloadBlob = (blob: Blob, fileName: string) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+
+    const downloadOrderPdf = async (id: string) => {
+        try {
+            const response = await paymentOrderApi.downloadDocumentPdf(id);
+            downloadBlob(response.data, `payment-order-${id}.pdf`);
+        } catch (e: any) {
+            setError(e.response?.data?.error || 'Ошибка скачивания PDF поручения');
+        }
+    };
+
+    const downloadOperationPdf = async (id: string) => {
+        try {
+            const response = await operationApi.downloadReceiptPdf(id);
+            downloadBlob(response.data, `operation-${id}.pdf`);
+        } catch (e: any) {
+            setError(e.response?.data?.error || 'Ошибка скачивания PDF квитанции');
         }
     };
 
@@ -224,15 +320,56 @@ const CorporateOrganization: React.FC = () => {
                                 <div className="p-3">
                                     {orders.map(o => (
                                         <div key={o.id} className="mb-3 pb-3 border-bottom">
-                                            <div>{o.recipientName} · {o.amount} · {o.status}</div>
+                                            <div>{o.recipientName} · {o.amount} · {
+                                                o.status === 'Draft' ? 'Черновик' :
+                                                o.status === 'Signed' ? 'Подписан' :
+                                                o.status === 'Executed' ? 'Исполнен' :
+                                                o.status === 'Cancelled' ? 'Отменён' : o.status
+                                            }</div>
+                                            <div className="small text-muted">
+                                                № {o.documentNumber || 'б/н'}
+                                                {o.documentDate ? ` от ${new Date(o.documentDate).toLocaleDateString('ru-RU')}` : ''}
+                                                {o.paymentPriority ? ` · Очередность ${o.paymentPriority}` : ''}
+                                            </div>
                                             <div className="small text-muted">{o.purpose}</div>
-                                            {o.status === 'Draft' && o.recipientAccountNumber && (
+                                            <button type="button" className="btn btn-sm btn-outline-secondary mt-1 me-2" onClick={() => downloadOrderPdf(o.id)}>
+                                                PDF
+                                            </button>
+                                            {o.status === 'Draft' && (
+                                                <button type="button" className="btn btn-sm btn-outline-primary mt-1 me-2" onClick={() => {
+                                                    if (orgId && hasPrivateKey(orgId)) {
+                                                        setSignatureForm(prev => ({ ...prev, deviceDetected: true }));
+                                                    }
+                                                    signOrder(o.id);
+                                                }}>
+                                                    Подписать ЭЦП
+                                                </button>
+                                            )}
+                                            {o.status === 'Signed' && o.recipientAccountNumber && (
                                                 <button type="button" className="btn btn-sm mt-1" onClick={() => executeOrder(o.id)}>Исполнить</button>
                                             )}
                                         </div>
                                     ))}
                                     <form onSubmit={createOrder} className="mt-3">
                                         <h4>Новое поручение</h4>
+                                        {orgId && hasPrivateKey(orgId) ? (
+                                            <div className="small mb-3 p-2" style={{ background: 'rgba(39,174,96,0.1)', borderRadius: 8, color: '#27ae60' }}>
+                                                ✓ Ключ ЭЦП организации найден — подпись будет сформирована автоматически
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="small mb-3 p-2" style={{ background: 'rgba(231,76,60,0.08)', borderRadius: 8, color: '#c0392b' }}>
+                                                    Ключ ЭЦП не найден в этом браузере. Введите подпись вручную или зарегистрируйте организацию заново.
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="form-label">ЭЦП подпись (для подписания черновиков)</label>
+                                                    <input className="form-input" value={signatureForm.signatureValue} onChange={e => handleSignatureChange(e.target.value)} placeholder="Вставьте подпись ЭЦП (мин. 10 символов)" />
+                                                    <div className="small mt-1" style={{ color: signatureForm.deviceDetected ? '#27ae60' : '#7f8c8d' }}>
+                                                        {signatureForm.deviceDetected ? '✓ Устройство ЭЦП обнаружено' : `Введите ещё ${Math.max(0, 10 - signatureForm.signatureValue.trim().length)} симв.`}
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
                                         <div className="form-group">
                                             <label className="form-label">Счёт списания</label>
                                             <select className="form-input" value={poForm.fromAccountId} onChange={e => setPoForm({ ...poForm, fromAccountId: e.target.value })} required>
@@ -245,6 +382,14 @@ const CorporateOrganization: React.FC = () => {
                                             <input className="form-input" type="number" value={poForm.amount} onChange={e => setPoForm({ ...poForm, amount: e.target.value })} required />
                                         </div>
                                         <div className="form-group">
+                                            <label className="form-label">Номер документа</label>
+                                            <input className="form-input" value={poForm.documentNumber} onChange={e => setPoForm({ ...poForm, documentNumber: e.target.value })} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Дата документа</label>
+                                            <input className="form-input" type="date" value={poForm.documentDate} onChange={e => setPoForm({ ...poForm, documentDate: e.target.value })} />
+                                        </div>
+                                        <div className="form-group">
                                             <label className="form-label">Получатель (наименование)</label>
                                             <input className="form-input" value={poForm.recipientName} onChange={e => setPoForm({ ...poForm, recipientName: e.target.value })} required />
                                         </div>
@@ -255,6 +400,14 @@ const CorporateOrganization: React.FC = () => {
                                         <div className="form-group">
                                             <label className="form-label">Номер счёта получателя в банке</label>
                                             <input className="form-input" value={poForm.recipientAccountNumber} onChange={e => setPoForm({ ...poForm, recipientAccountNumber: e.target.value })} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Банк получателя</label>
+                                            <input className="form-input" value={poForm.recipientBankName} onChange={e => setPoForm({ ...poForm, recipientBankName: e.target.value })} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">БИК банка получателя</label>
+                                            <input className="form-input" value={poForm.recipientBankBik} onChange={e => setPoForm({ ...poForm, recipientBankBik: e.target.value })} />
                                         </div>
                                         <div className="form-group">
                                             <label className="form-label">Назначение платежа</label>
@@ -272,7 +425,10 @@ const CorporateOrganization: React.FC = () => {
                                 <div className="p-3">
                                     {deposits.map(d => (
                                         <div key={d.id} className="mb-2 small">
-                                            {d.depositAccountNumber} · {d.principal} {d.annualRatePercent}% годовых · до {new Date(d.maturityDate).toLocaleDateString('ru-RU')} · {d.status}
+                                            {d.depositAccountNumber} · {d.principal} {d.annualRatePercent}% годовых · до {new Date(d.maturityDate).toLocaleDateString('ru-RU')} · {
+                                                d.status === 'Active' ? 'Активен' :
+                                                d.status === 'Closed' ? 'Закрыт' : d.status
+                                            }
                                         </div>
                                     ))}
                                     <form onSubmit={openDeposit} className="border-top pt-3 mt-3">
@@ -315,7 +471,12 @@ const CorporateOrganization: React.FC = () => {
                                             <td>{new Date(op.createdAt).toLocaleString('ru-RU')}</td>
                                             <td>{op.amount}</td>
                                             <td>{op.operationType}</td>
-                                            <td>{op.description}</td>
+                                            <td>
+                                                {op.description}
+                                                <button type="button" className="btn btn-sm btn-outline-secondary ms-2" onClick={() => downloadOperationPdf(op.id)}>
+                                                    PDF
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

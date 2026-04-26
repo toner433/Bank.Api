@@ -9,6 +9,7 @@ namespace Bank.Application.Services.Interfaces
     {
         Task<PaymentOrderDto> CreateAsync(CreatePaymentOrderRequest request, Guid actingUserId);
         Task<List<PaymentOrderDto>> ListByOrganizationAsync(Guid organizationId, Guid actingUserId);
-        Task<PaymentOrderDto> ExecuteAsync(Guid paymentOrderId, Guid actingUserId);
+        Task<PaymentOrderDto> SignAsync(Guid paymentOrderId, SignPaymentOrderRequest request, Guid actingUserId);
+        Task<PaymentOrderDto> ExecuteAsync(Guid paymentOrderId, bool deviceDetected, Guid actingUserId);
     }
 }

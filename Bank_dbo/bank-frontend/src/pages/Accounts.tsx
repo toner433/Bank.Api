@@ -22,7 +22,6 @@ const Accounts: React.FC = () => {
                     setAccounts(response.data as any[]);
                 }
             } catch (error) {
-                console.error('Ошибка загрузки счетов', error);
             }
         };
         fetchAccounts();

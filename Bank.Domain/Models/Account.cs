@@ -14,6 +14,8 @@ namespace Bank.Domain.Models
         public decimal Balance { get; set; }
         public string Currency { get; set; }
         public string AccountType { get; set; }
+        public bool IsBlocked { get; set; }
+        public string? AdminComment { get; set; }
         public DateTime OpenedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<Card> Cards { get; set; }

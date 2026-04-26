@@ -20,7 +20,6 @@ const CardDetail: React.FC = () => {
                     setAccount(accRes.data);
                 }
             } catch (error) {
-                console.error('Ошибка загрузки карты', error);
             } finally {
                 setLoading(false);
             }

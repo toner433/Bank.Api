@@ -22,7 +22,6 @@ const CreateCard: React.FC = () => {
                     setAccounts(acc.filter((a) => !a.organizationId && a.accountType !== 'time_deposit'));
                 }
             } catch (e) {
-                console.error('Ошибка загрузки счетов', e);
             }
         };
         fetchAccounts();

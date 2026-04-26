@@ -15,7 +15,6 @@ const Cards: React.FC = () => {
                     setCards(response.data as any[]);
                 }
             } catch (error) {
-                console.error('Ошибка загрузки карт', error);
             } finally {
                 setLoading(false);
             }

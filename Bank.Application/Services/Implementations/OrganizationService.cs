@@ -43,6 +43,7 @@ namespace Bank.Application.Services.Implementations
                 Inn = request.Inn.Trim(),
                 Kpp = string.IsNullOrWhiteSpace(request.Kpp) ? null : request.Kpp.Trim(),
                 LegalAddress = request.LegalAddress.Trim(),
+                PublicKeyPem = string.IsNullOrWhiteSpace(request.PublicKeyPem) ? null : request.PublicKeyPem.Trim(),
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -177,6 +178,7 @@ namespace Bank.Application.Services.Implementations
             Inn = o.Inn,
             Kpp = o.Kpp,
             LegalAddress = o.LegalAddress,
+            PublicKeyPem = o.PublicKeyPem,
             CreatedAt = o.CreatedAt
         };
     }

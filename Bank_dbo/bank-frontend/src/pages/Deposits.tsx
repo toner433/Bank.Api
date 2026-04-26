@@ -153,7 +153,7 @@ const Deposits: React.FC = () => {
                                         .map((d) => (
                                             <option key={d.id} value={d.id}>
                                                 {d.__orgName ? `${d.__orgName}: ` : 'Личный: '}
-                                                {d.depositAccountNumber} · {d.principal} {d.status}
+                                                {d.depositAccountNumber} · {d.principal} {d.status === 'Active' ? 'Активен' : d.status === 'Closed' ? 'Закрыт' : d.status}
                                             </option>
                                         ))}
                                 </select>
@@ -186,7 +186,7 @@ const Deposits: React.FC = () => {
                     {list.map((d) => (
                         <li key={d.id} className="list-group-item">
                             {d.__orgName ? `${d.__orgName} · ` : 'Личный · '}
-                            {d.depositAccountNumber} — {d.principal} @ {d.annualRatePercent}% — {d.status}
+                            {d.depositAccountNumber} — {d.principal} @ {d.annualRatePercent}% — {d.status === 'Active' ? 'Активен' : d.status === 'Closed' ? 'Закрыт' : d.status}
                         </li>
                     ))}
                     {list.length === 0 && <li className="list-group-item text-muted">Нет вкладов</li>}

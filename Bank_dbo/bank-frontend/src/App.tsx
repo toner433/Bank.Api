@@ -23,6 +23,7 @@ import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminOrganizationsPage from './pages/admin/AdminOrganizationsPage';
+import AdminAccountsPage from './pages/admin/AdminAccountsPage';
 import { useAuth } from './context/AuthContext';
 
 function AppRoutes() {
@@ -76,6 +77,7 @@ function AppRoutes() {
                     <Route index element={<AdminDashboard />} />
                     <Route path="users" element={<AdminUsersPage />} />
                     <Route path="organizations" element={<AdminOrganizationsPage />} />
+                    <Route path="accounts" element={<AdminAccountsPage />} />
                 </Route>
             </Route>
 

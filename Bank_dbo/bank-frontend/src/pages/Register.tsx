@@ -26,7 +26,6 @@ const Register: React.FC = () => {
             [name]: value
         });
 
-       
         if (errors[name]) {
             const newErrors = { ...errors };
             delete newErrors[name];
@@ -59,22 +58,7 @@ const Register: React.FC = () => {
             setSuccess('Регистрация успешна! Войдите в систему.');
             setTimeout(() => navigate('/login'), 2000);
         } catch (err: any) {
-            console.log('Ошибка:', err.response?.data);
-
-            
-            if (err.response?.data?.error) {
-                setErrors({ form: err.response.data.error });
-            }
-           
-            else if (err.response?.data?.message) {
-                setErrors({ form: err.response.data.message });
-            }
-           
-            else if (err.response?.data?.error) {
-                setErrors({ form: err.response.data.error });
-            }
-            
-            
+            setErrors({ form: err.response?.data?.error || err.response?.data?.message || 'Ошибка регистрации' });
         }
     };
 

@@ -17,7 +17,6 @@ const AccountDetail: React.FC = () => {
                 const historyRes = await accountApi.getHistory(id!);
                 setOperations(historyRes.data as any[]);
             } catch (error) {
-                console.error('Ошибка загрузки', error);
             } finally {
                 setLoading(false);
             }

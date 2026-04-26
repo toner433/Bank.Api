@@ -76,6 +76,33 @@ namespace Bank.Application.Services.Implementations
                 .ToList();
         }
 
+        public async Task<List<AdminAccountListItemDto>> ListAccountsAsync(Guid actingUserId)
+        {
+            await EnsureAdminAsync(actingUserId);
+            var accounts = await _db.GetAllAsync<Account>();
+            var users = await _db.GetAllAsync<User>();
+            var orgs = await _db.GetAllAsync<Organization>();
+
+            return accounts
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new AdminAccountListItemDto
+                {
+                    Id = x.Id,
+                    AccountNumber = x.AccountNumber,
+                    Balance = x.Balance,
+                    Currency = x.Currency,
+                    AccountType = x.AccountType,
+                    IsBlocked = x.IsBlocked,
+                    AdminComment = x.AdminComment,
+                    Owner = x.UserId.HasValue
+                        ? users.FirstOrDefault(u => u.Id == x.UserId.Value)?.FullName ?? "Пользователь"
+                        : (x.OrganizationId.HasValue
+                            ? orgs.FirstOrDefault(o => o.Id == x.OrganizationId.Value)?.Name ?? "Организация"
+                            : "Не определён")
+                })
+                .ToList();
+        }
+
         public async Task SetUserBlockedAsync(Guid actingUserId, Guid targetUserId, bool blocked)
         {
             await EnsureAdminAsync(actingUserId);
@@ -87,6 +114,35 @@ namespace Bank.Application.Services.Implementations
                 throw new BusinessException("Нельзя блокировать администратора");
             target.IsBlocked = blocked;
             await _db.UpdateAsync(target);
+        }
+
+        public async Task SetAccountBlockedAsync(Guid actingUserId, Guid accountId, bool blocked)
+        {
+            await EnsureAdminAsync(actingUserId);
+            var account = await _db.GetByIdAsync<Account>(accountId);
+            if (account == null) throw new NotFoundException("Счёт не найден");
+            account.IsBlocked = blocked;
+            await _db.UpdateAsync(account);
+        }
+
+        public async Task UpdateAccountAsync(Guid actingUserId, Guid accountId, UpdateAdminAccountRequest request)
+        {
+            await EnsureAdminAsync(actingUserId);
+            var account = await _db.GetByIdAsync<Account>(accountId);
+            if (account == null) throw new NotFoundException("Счёт не найден");
+            account.AdminComment = string.IsNullOrWhiteSpace(request.AdminComment) ? null : request.AdminComment.Trim();
+            if (request.Balance.HasValue)
+            {
+                if (request.Balance.Value < 0) throw new BusinessException("Баланс не может быть отрицательным");
+                account.Balance = request.Balance.Value;
+            }
+            if (!string.IsNullOrWhiteSpace(request.Currency))
+                account.Currency = request.Currency.Trim().ToUpper();
+            if (!string.IsNullOrWhiteSpace(request.AccountType))
+                account.AccountType = request.AccountType.Trim();
+            if (request.IsBlocked.HasValue)
+                account.IsBlocked = request.IsBlocked.Value;
+            await _db.UpdateAsync(account);
         }
     }
 }

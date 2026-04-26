@@ -76,6 +76,8 @@ namespace Bank.Application.Services.Implementations
                 Balance = account.Balance,
                 Currency = account.Currency,
                 AccountType = account.AccountType,
+                IsBlocked = account.IsBlocked,
+                AdminComment = account.AdminComment,
                 OpenedAt = account.OpenedAt,
                 OwnerName = ownerName,
                 OrganizationId = orgId,
@@ -164,6 +166,7 @@ namespace Bank.Application.Services.Implementations
         {
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
             await EnsureAccessAsync(actingUserId, account);
+            if (account!.IsBlocked) throw new BusinessException("Счёт заблокирован администратором");
             return account!.Balance;
         }
 
@@ -171,6 +174,7 @@ namespace Bank.Application.Services.Implementations
         {
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
             await EnsureAccessAsync(actingUserId, account);
+            if (account!.IsBlocked) throw new BusinessException("Счёт заблокирован администратором");
 
             var operations = await _accountRepository.GetOperationsByAccountIdAsync(accountId);
             var result = new List<OperationDto>();
@@ -225,6 +229,7 @@ namespace Bank.Application.Services.Implementations
 
             var account = await _dbRepository.GetByIdAsync<Account>(accountId);
             await EnsureAccessAsync(actingUserId, account);
+            if (account!.IsBlocked) throw new BusinessException("Счёт заблокирован администратором");
 
             var operationType = await _operationTypeRepository.GetByNameAsync("DEPOSIT");
             if (operationType == null)

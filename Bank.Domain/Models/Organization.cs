@@ -10,6 +10,7 @@ namespace Bank.Domain.Models
         public string Inn { get; set; } = string.Empty;
         public string? Kpp { get; set; }
         public string LegalAddress { get; set; } = string.Empty;
+        public string? PublicKeyPem { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<OrganizationMember> Members { get; set; } = new List<OrganizationMember>();
         public ICollection<Account> Accounts { get; set; } = new List<Account>();

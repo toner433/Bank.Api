@@ -28,27 +28,23 @@ const Login: React.FC = () => {
             const response = await authApi.login({ login, password });
             const payload = parseAuthResponse(response.data);
             if (!payload) {
-                console.error('Ответ входа без token/user:', response.data);
-                setError('Сервер вернул неожиданный ответ. Откройте консоль (F12).');
+                setError('Сервер вернул неожиданный ответ.');
                 return;
             }
             await setSession(payload.token, payload.userId, payload.isAdmin);
             navigate('/dashboard', { replace: true });
         } catch (err: unknown) {
-            console.error('Ошибка входа:', err);
             const ax = err as {
                 code?: string;
                 message?: string;
                 response?: { data?: { error?: string }; status?: number };
             };
             if (ax.code === 'ERR_NETWORK' || ax.message === 'Network Error') {
-                setError(
-                    'Нет связи с банком. Запустите API (dotnet run) и откройте https://localhost:7106 в браузере один раз, чтобы принять сертификат.'
-                );
+                setError('Нет связи с банком. Запустите API и откройте https://localhost:7106 в браузере один раз, чтобы принять сертификат.');
             } else if (ax.response?.status === 401) {
                 setError(ax.response?.data?.error || 'Неверный логин или пароль');
             } else {
-                setError(ax.response?.data?.error || 'Не удалось войти. Проверьте консоль (F12).');
+                setError(ax.response?.data?.error || 'Не удалось войти.');
             }
         } finally {
             setLoading(false);
@@ -234,9 +230,7 @@ const Login: React.FC = () => {
                         </div>
                     </div>
                 )}
-                <p className="text-muted small" style={{ textAlign: 'center', marginTop: '1.5rem', maxWidth: '28rem', marginLeft: 'auto', marginRight: 'auto' }}>
-                    Тестовый администратор: логин <strong>bankadmin</strong>, пароль <strong>Admin123!</strong> (только для разработки).
-                </p>
+                
             </main>
 
             <footer className="app-footer">

@@ -13,10 +13,12 @@ namespace Bank.API.Controllers
     public class OperationsController : ControllerBase
     {
         private readonly IOperationService _operationService;
+        private readonly IPdfDocumentService _pdfDocumentService;
 
-        public OperationsController(IOperationService operationService)
+        public OperationsController(IOperationService operationService, IPdfDocumentService pdfDocumentService)
         {
             _operationService = operationService;
+            _pdfDocumentService = pdfDocumentService;
         }
 
         [HttpGet("user/{userId:guid}")]
@@ -75,6 +77,26 @@ namespace Bank.API.Controllers
             if (operation == null)
                 return NotFound();
             return Ok(operation);
+        }
+
+        [HttpGet("{id:guid}/receipt.pdf")]
+        public async Task<IActionResult> DownloadReceiptPdf(Guid id)
+        {
+            var uid = User.GetCurrentUserId();
+            if (uid == null) return Unauthorized();
+            try
+            {
+                var pdf = await _pdfDocumentService.GenerateOperationReceiptPdfAsync(id, uid.Value);
+                return File(pdf, "application/pdf", $"operation-{id}.pdf");
+            }
+            catch (Bank.Application.Exceptions.NotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Bank.Application.Exceptions.BusinessException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
     }
 }

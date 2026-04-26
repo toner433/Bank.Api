@@ -56,6 +56,10 @@ namespace Bank.Application.Services.Implementations
 
             if (!await UserMayAccessAccountAsync(actingUserId, fromAccount))
                 throw new BusinessException("Нет прав на счёт списания");
+            if (fromAccount.IsBlocked)
+                throw new BusinessException("Счёт списания заблокирован администратором");
+            if (toAccount.IsBlocked)
+                throw new BusinessException("Счёт получателя заблокирован администратором");
 
             if (string.Equals(fromAccount.AccountType, "time_deposit", StringComparison.OrdinalIgnoreCase)
                 && !request.AllowFromTimeDeposit)

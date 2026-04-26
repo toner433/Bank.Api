@@ -3,6 +3,7 @@ using System;
 using Bank.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Bank.Infrastructure.Migrations
 {
     [DbContext(typeof(BankDbContext))]
-    partial class BankDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260424102532_ExpandPaymentOrderFields")]
+    partial class ExpandPaymentOrderFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,11 +47,6 @@ namespace Bank.Infrastructure.Migrations
                         .HasDefaultValue("current")
                         .HasColumnName("account_type");
 
-                    b.Property<string>("AdminComment")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("admin_comment");
-
                     b.Property<decimal>("Balance")
                         .ValueGeneratedOnAdd()
                         .HasPrecision(15, 2)
@@ -69,12 +67,6 @@ namespace Bank.Infrastructure.Migrations
                         .HasColumnType("character varying(3)")
                         .HasDefaultValue("BYN")
                         .HasColumnName("currency");
-
-                    b.Property<bool>("IsBlocked")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_blocked");
 
                     b.Property<DateTime>("OpenedAt")
                         .ValueGeneratedOnAdd()
@@ -324,10 +316,6 @@ namespace Bank.Infrastructure.Migrations
                         .HasColumnType("character varying(300)")
                         .HasColumnName("name");
 
-                    b.Property<string>("PublicKeyPem")
-                        .HasColumnType("text")
-                        .HasColumnName("public_key_pem");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Inn")
@@ -458,20 +446,6 @@ namespace Bank.Infrastructure.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)")
                         .HasColumnName("recipient_name");
-
-                    b.Property<string>("SignatureValue")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("signature_value");
-
-                    b.Property<DateTime?>("SignedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("signed_at");
-
-                    b.Property<string>("SignerCertificateThumbprint")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("signer_certificate_thumbprint");
 
                     b.Property<string>("Status")
                         .IsRequired()

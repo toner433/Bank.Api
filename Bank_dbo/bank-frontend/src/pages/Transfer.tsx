@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { accountApi } from '../services/api';
+import { accountApi, operationApi } from '../services/api';
 
 type RecipientPreview = {
     accountNumber: string;
@@ -24,6 +24,7 @@ const Transfer: React.FC = () => {
     const [previewLoading, setPreviewLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [completedOperationId, setCompletedOperationId] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const fromAccounts = useMemo(
@@ -80,7 +81,8 @@ const Transfer: React.FC = () => {
                     setError('Выберите счёт получателя из списка');
                     return;
                 }
-                await accountApi.transfer({ ...base, toAccountId });
+                const res = await accountApi.transfer({ ...base, toAccountId });
+                setCompletedOperationId((res.data as any).id);
             } else {
                 const num = toAccountNumber.trim();
                 if (!num) {
@@ -93,14 +95,14 @@ const Transfer: React.FC = () => {
                     setError('Для перевода на счёт юридического лица укажите ИНН организации (как в платёжном поручении).');
                     return;
                 }
-                await accountApi.transfer({
+                const res = await accountApi.transfer({
                     ...base,
                     toAccountNumber: num,
                     recipientInn: needInn ? inn : undefined,
                 });
+                setCompletedOperationId((res.data as any).id);
             }
             setSuccess('Перевод выполнен успешно!');
-            setTimeout(() => navigate('/accounts'), 2000);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Ошибка при переводе');
         }
@@ -284,6 +286,43 @@ const Transfer: React.FC = () => {
                                 Выполнить перевод
                             </button>
                         </form>
+
+                        {completedOperationId && (
+                            <div className="mt-4 p-3" style={{ borderTop: '1px solid var(--border)' }}>
+                                <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Чек по операции</div>
+                                <p className="text-muted small mb-3">Перевод проведён. Вы можете скачать квитанцию в формате PDF.</p>
+                                <div className="d-flex gap-2">
+                                    <button
+                                        type="button"
+                                        className="btn btn--sm"
+                                        onClick={async () => {
+                                            try {
+                                                const response = await operationApi.downloadReceiptPdf(completedOperationId);
+                                                const url = window.URL.createObjectURL(response.data);
+                                                const link = document.createElement('a');
+                                                link.href = url;
+                                                link.download = `receipt-${completedOperationId}.pdf`;
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                                window.URL.revokeObjectURL(url);
+                                            } catch {
+                                                setError('Ошибка скачивания квитанции');
+                                            }
+                                        }}
+                                    >
+                                        Скачать квитанцию PDF
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn--sm btn-outline-secondary"
+                                        onClick={() => navigate('/accounts')}
+                                    >
+                                        К счетам
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
