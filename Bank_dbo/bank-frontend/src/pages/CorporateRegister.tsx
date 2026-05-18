@@ -16,7 +16,7 @@ const CorporateRegister: React.FC = () => {
         setError('');
         setGenerating(true);
         try {
-            // Generate RSA key pair — public key goes to server, private stays in localStorage
+            
             const tempId = crypto.randomUUID();
             const publicKeyPem = await generateOrgKeyPair(tempId);
 
@@ -30,7 +30,7 @@ const CorporateRegister: React.FC = () => {
             const data = res.data as { id?: string; Id?: string };
             const newId = data.id ?? data.Id;
 
-            // Re-save keys under the real org ID
+            
             if (newId) {
                 const privateJwk = localStorage.getItem(`org_private_key_${tempId}`);
                 if (privateJwk) {

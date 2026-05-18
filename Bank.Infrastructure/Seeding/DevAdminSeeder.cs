@@ -9,7 +9,7 @@ namespace Bank.Infrastructure.Seeding
 {
     public static class DevAdminSeeder
     {
-        /// <summary>Логин bankadmin / пароль Admin123! — только для разработки.</summary>
+        
         public static async Task SeedAsync(BankDbContext db)
         {
             if (await db.Users.AnyAsync(u => u.Login == "bankadmin"))

@@ -1,0 +1,100 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="system-structure" name="Структура системы">
+    <mxGraphModel dx="1406" dy="780" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;" value="Автоматизированная система дистанционного банковского обслуживания" vertex="1">
+          <mxGeometry height="60" width="700" x="400" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль регистрации&#xa;и авторизации" vertex="1">
+          <mxGeometry height="60" width="180" x="144" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль управления&#xa;счетами" vertex="1">
+          <mxGeometry height="60" width="180" x="340" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль переводов&#xa;и операций" vertex="1">
+          <mxGeometry height="60" width="180" x="560" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль управления&#xa;картами" vertex="1">
+          <mxGeometry height="60" width="180" x="780" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль срочных&#xa;вкладов" vertex="1">
+          <mxGeometry height="60" width="180" x="1000" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль организаций" vertex="1">
+          <mxGeometry height="60" width="180" x="144" y="263" as="geometry" />
+        </mxCell>
+        <mxCell id="m7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль платежных&#xa;поручений" vertex="1">
+          <mxGeometry height="60" width="180" x="384" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="m8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль электронной&#xa;подписи" vertex="1">
+          <mxGeometry height="60" width="180" x="576" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="m9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль формирования&#xa;документов" vertex="1">
+          <mxGeometry height="60" width="180" x="785" y="258" as="geometry" />
+        </mxCell>
+        <mxCell id="m10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;align=center;" value="Модуль административного&#xa;управления" vertex="1">
+          <mxGeometry height="60" width="180" x="1000" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="60" />
+              <mxPoint x="115" y="293" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m7">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="238" />
+              <mxPoint x="476" y="238" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="238" />
+              <mxPoint x="666" y="238" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="title" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;" target="m9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="238" />
+              <mxPoint x="870" y="238" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="238" />
+              <mxPoint x="1090" y="238" />
+            </Array>
+            <mxPoint x="750" y="88" as="sourcePoint" />
+            <mxPoint x="1090" y="258" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

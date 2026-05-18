@@ -21,7 +21,7 @@ namespace Bank.Application.Services.Implementations
             if (string.IsNullOrWhiteSpace(signatureValue))
                 throw new BusinessException("Подпись ЭЦП не может быть пустой");
 
-            // Если публичный ключ не зарегистрирован — проверяем только длину (режим совместимости)
+            
             if (string.IsNullOrWhiteSpace(publicKeyPem))
             {
                 if (signatureValue.Trim().Length < 10)

@@ -1,0 +1,693 @@
+========================================
+ДИАГРАММЫ В НОТАЦИИ PlantUML
+Для рендеринга: https://www.plantuml.com/plantuml
+========================================
+
+
+--- Рисунок 2.1 - Неавторизованный пользователь ---
+
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+actor "Неавторизованный\nпользователь" as Guest
+
+rectangle "Система дистанционного банковского обслуживания" {
+
+  package "Подсистема аутентификации" {
+    usecase "Регистрация в системе" as UC1
+    usecase "Проверка уникальности логина" as UC1a
+    usecase "Проверка уникальности паспорта" as UC1b
+    usecase "Хеширование пароля" as UC1c
+    usecase "Вход в систему" as UC2
+    usecase "Проверка учётных данных" as UC2a
+    usecase "Создание сессионного токена" as UC2b
+    usecase "Сброс пароля" as UC3
+    usecase "Отправка кода на e-mail" as UC3a
+    usecase "Подтверждение кода" as UC3b
+    usecase "Установка нового пароля" as UC3c
+  }
+}
+
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+
+UC1 .> UC1a : <<include>>
+UC1 .> UC1b : <<include>>
+UC1 .> UC1c : <<include>>
+
+UC2 .> UC2a : <<include>>
+UC2 .> UC2b : <<include>>
+
+UC3 .> UC3a : <<include>>
+UC3 .> UC3b : <<include>>
+UC3 .> UC3c : <<include>>
+@enduml
+
+
+--- Рисунок 2.2 - Зарегистрированный пользователь ---
+
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+actor "Зарегистрированный\nпользователь" as User
+
+rectangle "Система дистанционного банковского обслуживания" {
+
+  package "Подсистема управления счетами" {
+    usecase "Просмотр списка счетов" as UC1
+    usecase "Просмотр баланса счёта" as UC2
+    usecase "Открытие нового счёта" as UC3
+    usecase "Просмотр истории операций" as UC4
+    usecase "Скачивание PDF-квитанции" as UC5
+  }
+
+  package "Подсистема переводов" {
+    usecase "Перевод на свой счёт" as UC6
+    usecase "Перевод по номеру счёта" as UC7
+    usecase "Проверка реквизитов получателя" as UC7a
+    usecase "Верификация УНП получателя" as UC7b
+  }
+
+  package "Подсистема карт" {
+    usecase "Просмотр карт" as UC8
+    usecase "Выпуск новой карты" as UC9
+    usecase "Блокировка карты" as UC10
+    usecase "Разблокировка карты" as UC11
+  }
+
+  package "Подсистема вкладов" {
+    usecase "Просмотр вкладов" as UC12
+    usecase "Открытие срочного вклада" as UC13
+    usecase "Закрытие вклада досрочно" as UC14
+  }
+
+  package "Подсистема профиля" {
+    usecase "Редактирование профиля" as UC15
+    usecase "Смена пароля" as UC16
+  }
+
+  package "Подсистема организаций" {
+    usecase "Регистрация организации" as UC17
+    usecase "Генерация ключевой пары ЭЦП" as UC17a
+  }
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+User --> UC9
+User --> UC10
+User --> UC11
+User --> UC12
+User --> UC13
+User --> UC14
+User --> UC15
+User --> UC16
+User --> UC17
+
+UC5 .> UC4 : <<include>>
+UC7 .> UC7a : <<include>>
+UC7a .> UC7b : <<extend>>
+UC17 .> UC17a : <<include>>
+@enduml
+
+
+--- Рисунок 2.3 - Сотрудник организации ---
+
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+actor "Директор" as Director
+actor "Бухгалтер" as Accountant
+Accountant -|> Director : <<generalization>>
+
+rectangle "Система дистанционного банковского обслуживания" {
+
+  package "Подсистема корпоративных счетов" {
+    usecase "Просмотр корпоративных счетов" as UC1
+    usecase "Просмотр выписки организации" as UC2
+    usecase "Открытие корпоративного счёта" as UC3
+    usecase "Скачивание PDF-квитанции" as UC4
+  }
+
+  package "Подсистема платёжных поручений" {
+    usecase "Создание платёжного поручения" as UC5
+    usecase "Проверка реквизитов поручения" as UC5a
+    usecase "Подписание поручения ЭЦП" as UC6
+    usecase "Формирование payload подписи" as UC6a
+    usecase "Подпись приватным ключом RSA" as UC6b
+    usecase "Исполнение поручения" as UC7
+    usecase "Верификация подписи на сервере" as UC7a
+    usecase "Списание средств со счёта" as UC7b
+    usecase "Скачивание PDF поручения" as UC8
+  }
+
+  package "Подсистема корпоративных вкладов" {
+    usecase "Открытие корпоративного вклада" as UC9
+    usecase "Закрытие корпоративного вклада" as UC10
+  }
+
+  package "Подсистема управления организацией" {
+    usecase "Просмотр состава сотрудников" as UC11
+    usecase "Добавление сотрудника" as UC12
+    usecase "Удаление сотрудника" as UC13
+  }
+}
+
+Director --> UC1
+Director --> UC2
+Director --> UC3
+Director --> UC4
+Director --> UC5
+Director --> UC6
+Director --> UC7
+Director --> UC8
+Director --> UC9
+Director --> UC10
+Director --> UC11
+Director --> UC12
+Director --> UC13
+
+UC5 .> UC5a : <<include>>
+UC6 .> UC6a : <<include>>
+UC6 .> UC6b : <<include>>
+UC7 .> UC7a : <<include>>
+UC7 .> UC7b : <<include>>
+UC7 .> UC6 : <<include>>
+UC4 .> UC2 : <<extend>>
+@enduml
+
+
+--- Рисунок 2.4 - Администратор банка ---
+
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+actor "Администратор\nбанка" as Admin
+
+rectangle "Система дистанционного банковского обслуживания" {
+
+  package "Подсистема мониторинга" {
+    usecase "Просмотр сводной статистики" as UC1
+    usecase "Количество пользователей" as UC1a
+    usecase "Количество организаций" as UC1b
+    usecase "Количество счетов" as UC1c
+  }
+
+  package "Подсистема управления пользователями" {
+    usecase "Просмотр списка пользователей" as UC2
+    usecase "Блокировка пользователя" as UC3
+    usecase "Разблокировка пользователя" as UC4
+  }
+
+  package "Подсистема управления счетами" {
+    usecase "Просмотр всех счетов" as UC5
+    usecase "Редактирование счёта" as UC6
+    usecase "Изменение баланса счёта" as UC6a
+    usecase "Изменение валюты счёта" as UC6b
+    usecase "Изменение типа счёта" as UC6c
+    usecase "Добавление комментария" as UC6d
+    usecase "Блокировка счёта" as UC7
+    usecase "Разблокировка счёта" as UC8
+  }
+
+  package "Подсистема управления организациями" {
+    usecase "Просмотр списка организаций" as UC9
+  }
+}
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+Admin --> UC9
+
+UC1 .> UC1a : <<include>>
+UC1 .> UC1b : <<include>>
+UC1 .> UC1c : <<include>>
+
+UC3 .> UC2 : <<extend>>
+UC4 .> UC2 : <<extend>>
+
+UC6 .> UC6a : <<extend>>
+UC6 .> UC6b : <<extend>>
+UC6 .> UC6c : <<extend>>
+UC6 .> UC6d : <<extend>>
+
+UC7 .> UC5 : <<extend>>
+UC8 .> UC5 : <<extend>>
+@enduml
+
+
+--- Рисунок 2.5 - Структура системы (компонентная диаграмма) ---
+
+@startuml
+skinparam componentStyle rectangle
+
+package "Клиентская часть (React 19 + TypeScript)" {
+  [Страницы и компоненты]
+  [Сервисы API (Axios)]
+  [Web Crypto API (ЭЦП)]
+}
+
+package "Серверная часть (ASP.NET Core 8.0)" {
+  package "Bank.API" {
+    [Контроллеры REST API]
+    [SessionAuthMiddleware]
+  }
+  package "Bank.Application" {
+    [Сервисы бизнес-логики]
+    [DTO]
+    [Интерфейсы]
+  }
+  package "Bank.Infrastructure" {
+    [Репозитории]
+    [BankDbContext (EF Core)]
+    [Миграции]
+  }
+  package "Bank.Domain" {
+    [Модели предметной области]
+  }
+}
+
+database "PostgreSQL" {
+  [База данных BankDb]
+}
+
+[Страницы и компоненты] --> [Сервисы API (Axios)]
+[Сервисы API (Axios)] --> [Контроллеры REST API] : HTTPS / JSON
+[Контроллеры REST API] --> [SessionAuthMiddleware]
+[Контроллеры REST API] --> [Сервисы бизнес-логики]
+[Сервисы бизнес-логики] --> [Репозитории]
+[Сервисы бизнес-логики] --> [Модели предметной области]
+[Репозитории] --> [BankDbContext (EF Core)]
+[BankDbContext (EF Core)] --> [База данных BankDb]
+@enduml
+
+
+--- Рисунок 2.6 - Блок-схема регистрации пользователя ---
+
+@startuml
+start
+:Пользователь заполняет форму регистрации;
+:Система проверяет заполненность обязательных полей;
+if (Все поля заполнены?) then (нет)
+  :Отображение сообщения об ошибке;
+  stop
+endif
+:Проверка уникальности логина в БД;
+if (Логин занят?) then (да)
+  :Сообщение "Логин уже используется";
+  stop
+endif
+:Проверка уникальности номера паспорта в БД;
+if (Паспорт уже зарегистрирован?) then (да)
+  :Сообщение "Паспорт уже зарегистрирован";
+  stop
+endif
+:Хеширование пароля (BCrypt, сложность 12);
+:Сохранение учётной записи в БД;
+:Создание сессионного токена;
+:Перенаправление в личный кабинет;
+stop
+@enduml
+
+
+--- Рисунок 2.7 - Блок-схема перевода средств ---
+
+@startuml
+start
+:Пользователь указывает счёт списания,\nполучателя и сумму;
+:Проверка существования счёта списания;
+if (Счёт найден?) then (нет)
+  :Ошибка "Счёт не найден";
+  stop
+endif
+:Проверка прав доступа пользователя к счёту;
+if (Доступ разрешён?) then (нет)
+  :Ошибка "Нет прав на счёт";
+  stop
+endif
+:Проверка статуса блокировки счёта списания;
+if (Счёт заблокирован?) then (да)
+  :Ошибка "Счёт заблокирован";
+  stop
+endif
+:Поиск счёта получателя;
+if (Счёт получателя найден?) then (нет)
+  :Ошибка "Счёт получателя не найден";
+  stop
+endif
+if (Получатель — юридическое лицо?) then (да)
+  :Проверка совпадения УНП;
+  if (УНП совпадает?) then (нет)
+    :Ошибка "УНП не совпадает";
+    stop
+  endif
+endif
+:Проверка совпадения валют счетов;
+if (Валюты совпадают?) then (нет)
+  :Ошибка "Валюты не совпадают";
+  stop
+endif
+:Проверка достаточности средств;
+if (Средств достаточно?) then (нет)
+  :Ошибка "Недостаточно средств";
+  stop
+endif
+:Списание суммы со счёта отправителя;
+:Зачисление суммы на счёт получателя;
+:Создание записи об операции в БД;
+:Возврат данных операции с идентификатором;
+stop
+@enduml
+
+
+--- Рисунок 2.8 - Блок-схема подписания платёжного поручения ЭЦП ---
+
+@startuml
+start
+:Пользователь нажимает "Подписать ЭЦП";
+:Проверка наличия приватного ключа\nв localStorage браузера;
+if (Ключ найден?) then (нет)
+  :Ошибка "Ключ ЭЦП не найден";
+  stop
+endif
+:Формирование payload:\n"id|сумма|получатель|счёт|назначение";
+:Подписание payload приватным ключом\n(RSASSA-PKCS1-v1_5, SHA-256);
+:Кодирование подписи в Base64;
+:Отправка подписи на сервер;
+:Сервер извлекает публичный ключ\nорганизации из БД;
+if (Публичный ключ найден?) then (нет)
+  :Проверка длины подписи (>= 10 символов);
+else (да)
+  :Формирование идентичного payload\nна основе данных поручения из БД;
+  :Верификация подписи (RSA.VerifyData);
+  if (Подпись действительна?) then (нет)
+    :Ошибка "Подпись ЭЦП недействительна";
+    stop
+  endif
+endif
+:Обновление статуса поручения на "Подписан";
+:Сохранение значения подписи в БД;
+:Возврат обновлённых данных поручения;
+stop
+@enduml
+
+
+
+--- Рисунок 2.5 - Структура автоматизированной системы дистанционного банковского обслуживания (модульная архитектура) ---
+
+@startuml
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  FontSize 12
+}
+
+package "Клиентская часть (React 19 + TypeScript)" {
+  [Веб-браузер пользователя]
+  [Web Crypto API (ЭЦП)]
+}
+
+package "Серверная часть (ASP.NET Core 8.0)" {
+  
+  package "Модуль единой точки входа (API Gateway)" {
+    [Контроллеры REST API]
+    [SessionAuthMiddleware]
+    [CORS Middleware]
+  }
+  
+  package "Модуль аутентификации и авторизации" {
+    [AuthController]
+    [UserService]
+    [SessionService]
+    [VerificationCodeService]
+  }
+  
+  package "Модуль управления счетами" {
+    [AccountService]
+    [AccountController]
+    [OperationService]
+  }
+  
+  package "Модуль управления картами" {
+    [CardService]
+    [CardController]
+  }
+  
+  package "Модуль корпоративного банкинга" {
+    [OrganizationService]
+    [PaymentOrderService]
+    [OrganizationController]
+    [PaymentOrderController]
+  }
+  
+  package "Модуль управления вкладами" {
+    [TimeDepositService]
+    [DepositController]
+  }
+  
+  package "Модуль административного управления" {
+    [AdminService]
+    [AdminController]
+  }
+  
+  package "Модуль документооборота" {
+    [PdfDocumentService]
+    [MockElectronicSignatureService]
+  }
+  
+  package "Слой доступа к данным" {
+    [Репозитории]
+    [BankDbContext (EF Core)]
+  }
+}
+
+database "PostgreSQL" {
+  [База данных BankDb]
+}
+
+[Веб-браузер пользователя] --> [Контроллеры REST API] : HTTPS / JSON
+[Web Crypto API (ЭЦП)] --> [Контроллеры REST API] : Подпись ЭЦП
+
+[Контроллеры REST API] --> [SessionAuthMiddleware] : Проверка токенов
+[SessionAuthMiddleware] --> [CORS Middleware] : Обработка CORS
+
+[Контроллеры REST API] --> [AuthController] : Маршрутизация
+[Контроллеры REST API] --> [AccountController] : Маршрутизация
+[Контроллеры REST API] --> [CardController] : Маршрутизация
+[Контроллеры REST API] --> [OrganizationController] : Маршрутизация
+[Контроллеры REST API] --> [PaymentOrderController] : Маршрутизация
+[Контроллеры REST API] --> [DepositController] : Маршрутизация
+[Контроллеры REST API] --> [AdminController] : Маршрутизация
+
+[AuthController] --> [UserService] : Бизнес-логика
+[AccountController] --> [AccountService] : Бизнес-логика
+[CardController] --> [CardService] : Бизнес-логика
+[OrganizationController] --> [OrganizationService] : Бизнес-логика
+[PaymentOrderController] --> [PaymentOrderService] : Бизнес-логика
+[DepositController] --> [TimeDepositService] : Бизнес-логика
+[AdminController] --> [AdminService] : Бизнес-логика
+
+[UserService] --> [Репозитории] : Доступ к данным
+[AccountService] --> [Репозитории] : Доступ к данным
+[CardService] --> [Репозитории] : Доступ к данным
+[OrganizationService] --> [Репозитории] : Доступ к данным
+[PaymentOrderService] --> [Репозитории] : Доступ к данным
+[TimeDepositService] --> [Репозитории] : Доступ к данных
+[AdminService] --> [Репозитории] : Доступ к данных
+[PdfDocumentService] --> [Репозитории] : Доступ к данных
+
+[Репозитории] --> [BankDbContext (EF Core)] : ORM
+[BankDbContext (EF Core)] --> [База данных BankDb] : SQL
+
+[PaymentOrderService] --> [MockElectronicSignatureService] : Верификация ЭЦП
+[OrganizationService] --> [MockElectronicSignatureService] : Генерация ключей
+
+@enduml
+
+
+--- Рисунок 2.9 - ER-диаграмма логической схемы БД в нотации П.Чена ---
+
+@startuml
+skinparam entity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  FontSize 12
+}
+
+entity "users" {
+  * id : UUID
+  --
+  * login : VARCHAR(100)
+  * password_hash : VARCHAR(255)
+  * full_name : VARCHAR(255)
+  * email : VARCHAR(255)
+  * phone : VARCHAR(30)
+  * passport_number : VARCHAR(30)
+  * is_blocked : BOOLEAN
+  * is_admin : BOOLEAN
+  * created_at : DATETIME
+}
+
+entity "accounts" {
+  * id : UUID
+  --
+  * account_number : VARCHAR(34)
+  * currency : VARCHAR(3)
+  * account_type : VARCHAR(50)
+  * balance : DECIMAL(18,2)
+  * is_blocked : BOOLEAN
+  * admin_comment : VARCHAR(500)
+  * user_id : UUID
+  * organization_id : UUID
+  * created_at : DATETIME
+}
+
+entity "organizations" {
+  * id : UUID
+  --
+  * name : VARCHAR(255)
+  * inn : VARCHAR(20)
+  * kpp : VARCHAR(20)
+  * legal_address : VARCHAR(500)
+  * public_key : TEXT
+  * created_at : DATETIME
+}
+
+entity "organization_members" {
+  * id : UUID
+  --
+  * organization_id : UUID
+  * user_id : UUID
+  * role : VARCHAR(50)
+  * added_at : DATETIME
+}
+
+entity "payment_orders" {
+  * id : UUID
+  --
+  * document_number : VARCHAR(50)
+  * document_date : DATETIME
+  * organization_id : UUID
+  * from_account_id : UUID
+  * recipient_name : VARCHAR(255)
+  * recipient_account : VARCHAR(34)
+  * amount : DECIMAL(18,2)
+  * purpose : VARCHAR(1000)
+  * status : VARCHAR(30)
+  * signature_value : TEXT
+  * signed_at : DATETIME
+  * executed_at : DATETIME
+}
+
+entity "operations" {
+  * id : UUID
+  --
+  * from_account_id : UUID
+  * to_account_id : UUID
+  * amount : DECIMAL(18,2)
+  * operation_type : VARCHAR(30)
+  * status : VARCHAR(30)
+  * description : VARCHAR(500)
+  * created_at : DATETIME
+  * completed_at : DATETIME
+}
+
+entity "cards" {
+  * id : UUID
+  --
+  * card_number : VARCHAR(16)
+  * card_holder : VARCHAR(255)
+  * expiry_date : VARCHAR(5)
+  * cvv_hash : VARCHAR(255)
+  * account_id : UUID
+  * status : VARCHAR(30)
+  * created_at : DATETIME
+}
+
+entity "time_deposits" {
+  * id : UUID
+  --
+  * principal_amount : DECIMAL(18,2)
+  * interest_rate : DECIMAL(5,2)
+  * term_months : INT
+  * opened_at : DATETIME
+  * maturity_date : DATETIME
+  * status : VARCHAR(30)
+  * source_account_id : UUID
+  * user_id : UUID
+  * organization_id : UUID
+}
+
+entity "sessions" {
+  * id : UUID
+  --
+  * user_id : UUID
+  * session_token : VARCHAR(255)
+  * expires_at : DATETIME
+  * created_at : DATETIME
+}
+
+entity "verification_codes" {
+  * id : UUID
+  --
+  * user_id : UUID
+  * code : VARCHAR(10)
+  * type : VARCHAR(30)
+  * expires_at : DATETIME
+  * used_at : DATETIME
+  * created_at : DATETIME
+}
+
+users ||--o{ accounts : "владеет"
+users ||--o{ organization_members : "является участником"
+organizations ||--o{ accounts : "владеет"
+organizations ||--o{ organization_members : "имеет участников"
+organizations ||--o{ payment_orders : "создает"
+accounts ||--o{ payment_orders : "используется для списания"
+accounts ||--o{ operations : "используется как источник"
+accounts ||--o{ operations : "используется как получатель"
+accounts ||--o{ cards : "привязана к"
+accounts ||--o{ time_deposits : "используется как источник"
+users ||--o{ time_deposits : "открывает"
+organizations ||--o{ time_deposits : "открывает"
+users ||--o{ sessions : "имеет"
+users ||--o{ verification_codes : "получает"
+@enduml

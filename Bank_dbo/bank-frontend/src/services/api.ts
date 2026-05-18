@@ -123,9 +123,12 @@ export const paymentOrderApi = {
 
 export const adminApi = {
     stats: () => api.get('/Admin/stats'),
-    users: () => api.get('/Admin/users'),
-    organizations: () => api.get('/Admin/organizations'),
-    accounts: () => api.get('/Admin/accounts'),
+    users: (params?: { status?: string; role?: string; search?: string; sortBy?: string; sortOrder?: string }) => 
+        api.get('/Admin/users', { params }),
+    organizations: (params?: { search?: string; sortBy?: string; sortOrder?: string }) => 
+        api.get('/Admin/organizations', { params }),
+    accounts: (params?: { currency?: string; accountType?: string; status?: string; search?: string; sortBy?: string; sortOrder?: string }) => 
+        api.get('/Admin/accounts', { params }),
     blockUser: (id: string) => api.post(`/Admin/users/${id}/block`),
     unblockUser: (id: string) => api.post(`/Admin/users/${id}/unblock`),
     blockAccount: (id: string) => api.post(`/Admin/accounts/${id}/block`),

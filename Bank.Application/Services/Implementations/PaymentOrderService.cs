@@ -120,13 +120,12 @@ namespace Bank.Application.Services.Implementations
 
             await _electronicSignatureService.EnsureDeviceAvailableAsync(request.DeviceDetected);
 
-            // Канонический payload — та же строка что подписывает фронт
+            
             var payload = $"{order.Id}|{order.Amount}|{order.RecipientName}|{order.RecipientAccountNumber}|{order.Purpose}";
 
             var org = await _db.GetByIdAsync<Organization>(order.OrganizationId);
 
-            // Если у организации есть публичный ключ — проверяем криптографически
-            // Если нет — требуем флаг устройства как запасной вариант
+           
             if (string.IsNullOrWhiteSpace(org?.PublicKeyPem))
                 await _electronicSignatureService.EnsureDeviceAvailableAsync(request.DeviceDetected);
 
@@ -165,7 +164,7 @@ namespace Bank.Application.Services.Implementations
             if (fromAccount.IsBlocked) throw new BusinessException("Счёт списания заблокирован");
             if (fromAccount.Balance < order.Amount) throw new BusinessException("Недостаточно средств на счёте");
 
-            // Внешний платёж — списываем с корпоративного счёта
+            
             fromAccount.Balance -= order.Amount;
             await _db.UpdateAsync(fromAccount);
 

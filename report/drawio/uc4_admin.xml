@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="ztdBa4zwfEecJ0bgrR8F" name="Страница-1">
+    <mxGraphModel dx="1134" dy="538" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="actor1" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="Администратор&#xa;банка" vertex="1">
+          <mxGeometry height="60" width="40" x="520" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_usr" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="Управление пользователями" vertex="1">
+          <mxGeometry height="60" width="210" x="430" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_usr1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Просмотр списка пользователей" vertex="1">
+          <mxGeometry height="55" width="200" x="360" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_usr2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Блокировка пользователя" vertex="1">
+          <mxGeometry height="55" width="200" x="570" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_usr3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Разблокировка пользователя" vertex="1">
+          <mxGeometry height="55" width="200" x="670" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_acc" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="Управление счетами" vertex="1">
+          <mxGeometry height="60" width="210" x="290" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_acc1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Просмотр всех счетов" vertex="1">
+          <mxGeometry height="55" width="200" x="90" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_acc2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Редактирование счёта" vertex="1">
+          <mxGeometry height="55" width="200" x="70" y="297.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_acc3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Блокировка счёта" vertex="1">
+          <mxGeometry height="55" width="200" x="230" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_acc4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Разблокировка счёта" vertex="1">
+          <mxGeometry height="55" width="200" x="210" y="242.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_stat" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" value="Мониторинг системы" vertex="1">
+          <mxGeometry height="60" width="210" x="650" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_stat1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Просмотр сводной статистики" vertex="1">
+          <mxGeometry height="55" width="200" x="700" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_stat2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" value="Просмотр списка организаций" vertex="1">
+          <mxGeometry height="55" width="200" x="500" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="actor1" style="endArrow=none;html=1;exitPerimeter=0;entryPerimeter=0;exitX=0;exitY=0.3333333333333333;exitDx=0;exitDy=0;" target="uc_usr">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="actor1" style="endArrow=none;html=1;exitPerimeter=0;entryPerimeter=0;exitX=0;exitY=0.3333333333333333;exitDx=0;exitDy=0;" target="uc_acc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="actor1" style="endArrow=none;html=1;exitPerimeter=0;entryPerimeter=0;exitX=1;exitY=0.3333333333333333;exitDx=0;exitDy=0;" target="uc_stat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i1" edge="1" parent="1" source="uc_usr" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_usr1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i2" edge="1" parent="1" source="uc_usr" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_usr2" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i3" edge="1" parent="1" source="uc_usr" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_usr3" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i4" edge="1" parent="1" source="uc_acc" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_acc1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i5" edge="1" parent="1" source="uc_acc" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_acc2" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i6" edge="1" parent="1" source="uc_acc" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_acc3" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i7" edge="1" parent="1" source="uc_acc" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_acc4" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i8" edge="1" parent="1" source="uc_stat" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_stat1" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="i9" edge="1" parent="1" source="uc_stat" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;exitPerimeter=0;entryPerimeter=0;" target="uc_stat2" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

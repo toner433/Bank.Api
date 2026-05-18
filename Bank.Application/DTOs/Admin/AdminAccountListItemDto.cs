@@ -12,6 +12,7 @@ namespace Bank.Application.DTOs.Admin
         public bool IsBlocked { get; set; }
         public string? AdminComment { get; set; }
         public string Owner { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
     }
 }
 

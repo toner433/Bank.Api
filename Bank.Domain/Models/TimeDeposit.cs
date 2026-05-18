@@ -2,7 +2,7 @@ using System;
 
 namespace Bank.Domain.Models
 {
-    /// <summary>Срочный вклад: отдельный счёт и срок с фиксированной ставкой.</summary>
+   
     public class TimeDeposit
     {
         public Guid Id { get; set; }
@@ -17,7 +17,7 @@ namespace Bank.Domain.Models
         public int TermMonths { get; set; }
         public DateTime OpenedAt { get; set; }
         public DateTime MaturityDate { get; set; }
-        /// <summary>Active, Closed</summary>
+        
         public string Status { get; set; } = "Active";
     }
 }

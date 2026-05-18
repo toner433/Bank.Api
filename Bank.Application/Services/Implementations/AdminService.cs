@@ -41,12 +41,64 @@ namespace Bank.Application.Services.Implementations
             };
         }
 
-        public async Task<List<AdminUserListItemDto>> ListUsersAsync(Guid actingUserId)
+        public async Task<List<AdminUserListItemDto>> ListUsersAsync(Guid actingUserId, AdminUserFilterRequest? filter = null)
         {
             await EnsureAdminAsync(actingUserId);
             var users = await _db.GetAllAsync<User>();
-            return users
-                .OrderByDescending(x => x.CreatedAt)
+            
+            if (filter != null)
+            {
+                if (!string.IsNullOrEmpty(filter.Status) && filter.Status != "all")
+                {
+                    users = filter.Status switch
+                    {
+                        "blocked" => users.Where(x => x.IsBlocked).ToList(),
+                        "active" => users.Where(x => !x.IsBlocked).ToList(),
+                        _ => users
+                    };
+                }
+                
+                if (!string.IsNullOrEmpty(filter.Role) && filter.Role != "all")
+                {
+                    users = filter.Role switch
+                    {
+                        "admin" => users.Where(x => x.IsAdmin).ToList(),
+                        "client" => users.Where(x => !x.IsAdmin).ToList(),
+                        _ => users
+                    };
+                }
+                
+                if (!string.IsNullOrWhiteSpace(filter.Search))
+                {
+                    var search = filter.Search.ToLower().Trim();
+                    users = users.Where(x => 
+                        x.Login.ToLower().Contains(search) ||
+                        x.FullName.ToLower().Contains(search) ||
+                        x.Email.ToLower().Contains(search)
+                    ).ToList();
+                }
+            }
+            
+            var sortBy = filter?.SortBy ?? "createdAt";
+            var sortOrder = filter?.SortOrder ?? "desc";
+            
+            var sorted = sortBy switch
+            {
+                "login" => sortOrder == "asc" 
+                    ? users.OrderBy(x => x.Login) 
+                    : users.OrderByDescending(x => x.Login),
+                "fullName" => sortOrder == "asc" 
+                    ? users.OrderBy(x => x.FullName) 
+                    : users.OrderByDescending(x => x.FullName),
+                "email" => sortOrder == "asc" 
+                    ? users.OrderBy(x => x.Email) 
+                    : users.OrderByDescending(x => x.Email),
+                _ => sortOrder == "asc" 
+                    ? users.OrderBy(x => x.CreatedAt) 
+                    : users.OrderByDescending(x => x.CreatedAt)
+            };
+            
+            return sorted
                 .Select(x => new AdminUserListItemDto
                 {
                     Id = x.Id,
@@ -60,12 +112,40 @@ namespace Bank.Application.Services.Implementations
                 .ToList();
         }
 
-        public async Task<List<AdminOrganizationListItemDto>> ListOrganizationsAsync(Guid actingUserId)
+        public async Task<List<AdminOrganizationListItemDto>> ListOrganizationsAsync(Guid actingUserId, AdminOrganizationFilterRequest? filter = null)
         {
             await EnsureAdminAsync(actingUserId);
             var orgs = await _db.GetAllAsync<Organization>();
-            return orgs
-                .OrderByDescending(x => x.CreatedAt)
+            
+            if (filter != null)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.Search))
+                {
+                    var search = filter.Search.ToLower().Trim();
+                    orgs = orgs.Where(x => 
+                        x.Name.ToLower().Contains(search) ||
+                        x.Inn.ToLower().Contains(search)
+                    ).ToList();
+                }
+            }
+            
+            var sortBy = filter?.SortBy ?? "createdAt";
+            var sortOrder = filter?.SortOrder ?? "desc";
+            
+            var sorted = sortBy switch
+            {
+                "name" => sortOrder == "asc" 
+                    ? orgs.OrderBy(x => x.Name) 
+                    : orgs.OrderByDescending(x => x.Name),
+                "inn" => sortOrder == "asc" 
+                    ? orgs.OrderBy(x => x.Inn) 
+                    : orgs.OrderByDescending(x => x.Inn),
+                _ => sortOrder == "asc" 
+                    ? orgs.OrderBy(x => x.CreatedAt) 
+                    : orgs.OrderByDescending(x => x.CreatedAt)
+            };
+            
+            return sorted
                 .Select(x => new AdminOrganizationListItemDto
                 {
                     Id = x.Id,
@@ -76,15 +156,63 @@ namespace Bank.Application.Services.Implementations
                 .ToList();
         }
 
-        public async Task<List<AdminAccountListItemDto>> ListAccountsAsync(Guid actingUserId)
+        public async Task<List<AdminAccountListItemDto>> ListAccountsAsync(Guid actingUserId, AdminAccountFilterRequest? filter = null)
         {
             await EnsureAdminAsync(actingUserId);
             var accounts = await _db.GetAllAsync<Account>();
             var users = await _db.GetAllAsync<User>();
             var orgs = await _db.GetAllAsync<Organization>();
-
-            return accounts
-                .OrderByDescending(x => x.CreatedAt)
+            
+            if (filter != null)
+            {
+                if (!string.IsNullOrEmpty(filter.Currency) && filter.Currency != "all")
+                {
+                    accounts = accounts.Where(x => x.Currency == filter.Currency).ToList();
+                }
+                
+                if (!string.IsNullOrEmpty(filter.AccountType) && filter.AccountType != "all")
+                {
+                    accounts = accounts.Where(x => x.AccountType == filter.AccountType).ToList();
+                }
+                
+                if (!string.IsNullOrEmpty(filter.Status) && filter.Status != "all")
+                {
+                    accounts = filter.Status switch
+                    {
+                        "blocked" => accounts.Where(x => x.IsBlocked).ToList(),
+                        "active" => accounts.Where(x => !x.IsBlocked).ToList(),
+                        _ => accounts
+                    };
+                }
+                
+                if (!string.IsNullOrWhiteSpace(filter.Search))
+                {
+                    var search = filter.Search.ToLower().Trim();
+                    accounts = accounts.Where(x => 
+                        x.AccountNumber.ToLower().Contains(search) ||
+                        (x.UserId.HasValue && users.FirstOrDefault(u => u.Id == x.UserId.Value)?.FullName.ToLower().Contains(search) == true) ||
+                        (x.OrganizationId.HasValue && orgs.FirstOrDefault(o => o.Id == x.OrganizationId.Value)?.Name.ToLower().Contains(search) == true)
+                    ).ToList();
+                }
+            }
+            
+            var sortBy = filter?.SortBy ?? "createdAt";
+            var sortOrder = filter?.SortOrder ?? "desc";
+            
+            var sorted = sortBy switch
+            {
+                "accountNumber" => sortOrder == "asc" 
+                    ? accounts.OrderBy(x => x.AccountNumber) 
+                    : accounts.OrderByDescending(x => x.AccountNumber),
+                "balance" => sortOrder == "asc" 
+                    ? accounts.OrderBy(x => x.Balance) 
+                    : accounts.OrderByDescending(x => x.Balance),
+                _ => sortOrder == "asc" 
+                    ? accounts.OrderBy(x => x.CreatedAt) 
+                    : accounts.OrderByDescending(x => x.CreatedAt)
+            };
+            
+            return sorted
                 .Select(x => new AdminAccountListItemDto
                 {
                     Id = x.Id,
@@ -98,7 +226,8 @@ namespace Bank.Application.Services.Implementations
                         ? users.FirstOrDefault(u => u.Id == x.UserId.Value)?.FullName ?? "Пользователь"
                         : (x.OrganizationId.HasValue
                             ? orgs.FirstOrDefault(o => o.Id == x.OrganizationId.Value)?.Name ?? "Организация"
-                            : "Не определён")
+                            : "Не определён"),
+                    CreatedAt = x.CreatedAt
                 })
                 .ToList();
         }

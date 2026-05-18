@@ -14,7 +14,7 @@ namespace Bank.Domain.Models
         public string PassportNumber { get; set; }
         public DateOnly BirthDate { get; set; }
         public bool IsBlocked { get; set; }
-        /// <summary>Системный администратор банка (отдельный кабинет в приложении).</summary>
+        
         public bool IsAdmin { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<Account> Accounts { get; set; }

@@ -1,0 +1,152 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="data-flow-diagram" name="Схема информационных потоков">
+    <mxGraphModel dx="1480" dy="821" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="client" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;fontStyle=1;align=center;" value="Клиент&#xa;(React + TypeScript)&#xa;Браузер" vertex="1">
+          <mxGeometry height="80" width="140" x="60" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="admin" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;fontStyle=1;align=center;" value="Администратор&#xa;(React + TypeScript)&#xa;Браузер" vertex="1">
+          <mxGeometry height="80" width="140" x="60" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="api" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=12;fontStyle=1;align=center;" value="Bank.API&#xa;(Контроллеры)&#xa;Порт: 7106" vertex="1">
+          <mxGeometry height="80" width="160" x="320" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="app" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;fontStyle=1;align=center;" value="Bank.Application&#xa;(Сервисы)&#xa;Бизнес-логика" vertex="1">
+          <mxGeometry height="80" width="180" x="596" y="322" as="geometry" />
+        </mxCell>
+        <mxCell id="domain" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;fontStyle=1;align=center;" value="Bank.Domain&#xa;(Модели)&#xa;Сущности" vertex="1">
+          <mxGeometry height="80" width="160" x="860" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="infra" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=11;fontStyle=1;align=center;" value="Bank.Infrastructure&#xa;(Репозитории)&#xa;Доступ к данным" vertex="1">
+          <mxGeometry height="80" width="180" x="1100" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="db" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;strokeColor=#000000;fontSize=11;fontStyle=1;align=center;" value="База данных&#xa;PostgreSQL&#xa;Порт: 5432" vertex="1">
+          <mxGeometry height="100" width="130" x="1370" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="svc1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="UserService" vertex="1">
+          <mxGeometry height="40" width="85" x="561" y="163" as="geometry" />
+        </mxCell>
+        <mxCell id="svc2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="AccountService" vertex="1">
+          <mxGeometry height="40" width="85" x="703" y="159" as="geometry" />
+        </mxCell>
+        <mxCell id="svc3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="OperationService" vertex="1">
+          <mxGeometry height="40" width="85" x="561" y="213" as="geometry" />
+        </mxCell>
+        <mxCell id="svc4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="CardService" vertex="1">
+          <mxGeometry height="40" width="85" x="703" y="211" as="geometry" />
+        </mxCell>
+        <mxCell id="svc5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="OrganizationService" vertex="1">
+          <mxGeometry height="40" width="85" x="561" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="svc6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="PaymentOrderService" vertex="1">
+          <mxGeometry height="40" width="85" x="699" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="svc7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="AdminService" vertex="1">
+          <mxGeometry height="40" width="85" x="630" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="ext1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="Email сервер&#xa;(SMTP)" vertex="1">
+          <mxGeometry height="50" width="85" x="580" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="ext2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" value="ЭЦП&#xa;(Mock)" vertex="1">
+          <mxGeometry height="50" width="85" x="675" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="arr1" edge="1" parent="1" source="client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;html=1;strokeWidth=1;strokeColor=#000000;" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr1lbl" connectable="0" parent="arr1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontColor=#000000;" value="HTTP/HTTPS&#xa;JSON" vertex="1">
+          <mxGeometry relative="1" x="-0.3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr2" edge="1" parent="1" source="admin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;html=1;strokeWidth=1;strokeColor=#000000;" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr3" edge="1" parent="1" source="api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;startArrow=classic;html=1;strokeWidth=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr3lbl" connectable="0" parent="arr3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontColor=#000000;" value="DTO" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr4" edge="1" parent="1" source="app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;startArrow=classic;html=1;strokeWidth=1;strokeColor=#000000;" target="domain">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr4lbl" connectable="0" parent="arr4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontColor=#000000;" value="Entities" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr5" edge="1" parent="1" source="app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;startArrow=classic;html=1;strokeWidth=1;strokeColor=#000000;" target="infra">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr5lbl" connectable="0" parent="arr5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontColor=#000000;" value="Repository" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr6" edge="1" parent="1" source="infra" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;startArrow=classic;html=1;strokeWidth=1;strokeColor=#000000;" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr6lbl" connectable="0" parent="arr6" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontColor=#000000;" value="SQL&#xa;Entity Framework" vertex="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arr7" edge="1" parent="1" source="svc1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;dashed=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr8" edge="1" parent="1" source="svc2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;dashed=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr9" edge="1" parent="1" source="svc3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;dashed=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr10" edge="1" parent="1" source="svc4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;dashed=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr11" edge="1" parent="1" source="svc5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;dashed=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr12" edge="1" parent="1" source="svc6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;dashed=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr13" edge="1" parent="1" source="svc7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=none;html=1;dashed=1;strokeColor=#000000;" target="app">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr14" edge="1" parent="1" source="app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;html=1;strokeColor=#000000;" target="ext1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr15" edge="1" parent="1" source="app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=classic;startArrow=classic;html=1;strokeColor=#000000;" target="ext2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#000000;" value="Схема информационных потоков системы дистанционного банковского обслуживания" vertex="1">
+          <mxGeometry height="30" width="600" x="400" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=10;fontStyle=1;align=center;verticalAlign=top;" value="Легенда" vertex="1">
+          <mxGeometry height="120" width="280" x="60" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=9;align=center;" value="Внешние системы / Клиенты" vertex="1">
+          <mxGeometry height="25" width="120" x="80" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=9;align=center;" value="API (Контроллеры)" vertex="1">
+          <mxGeometry height="25" width="100" x="210" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=9;align=center;" value="Application (Сервисы)" vertex="1">
+          <mxGeometry height="25" width="120" x="80" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=9;align=center;" value="Domain (Модели)" vertex="1">
+          <mxGeometry height="25" width="100" x="210" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=9;align=center;" value="Infrastructure (Репозитории)" vertex="1">
+          <mxGeometry height="25" width="120" x="80" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=7;fillColor=#ffffff;strokeColor=#000000;fontSize=9;align=center;" value="База данных" vertex="1">
+          <mxGeometry height="35" width="60" x="210" y="745" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

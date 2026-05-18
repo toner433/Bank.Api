@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Bank.Application.Services.Interfaces;
+using Bank.Application.DTOs.Admin;
 using Bank.Application.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,13 +43,22 @@ namespace Bank.API.Controllers
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> Users()
+        public async Task<IActionResult> Users([FromQuery] string? status, [FromQuery] string? role, 
+            [FromQuery] string? search, [FromQuery] string? sortBy, [FromQuery] string? sortOrder)
         {
             var uid = CurrentUserId;
             if (uid == null) return Unauthorized();
             try
             {
-                var list = await _adminService.ListUsersAsync(uid.Value);
+                var filter = new AdminUserFilterRequest
+                {
+                    Status = status,
+                    Role = role,
+                    Search = search,
+                    SortBy = sortBy,
+                    SortOrder = sortOrder
+                };
+                var list = await _adminService.ListUsersAsync(uid.Value, filter);
                 return Ok(list);
             }
             catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))
@@ -62,13 +72,20 @@ namespace Bank.API.Controllers
         }
 
         [HttpGet("organizations")]
-        public async Task<IActionResult> Organizations()
+        public async Task<IActionResult> Organizations([FromQuery] string? search, 
+            [FromQuery] string? sortBy, [FromQuery] string? sortOrder)
         {
             var uid = CurrentUserId;
             if (uid == null) return Unauthorized();
             try
             {
-                var list = await _adminService.ListOrganizationsAsync(uid.Value);
+                var filter = new AdminOrganizationFilterRequest
+                {
+                    Search = search,
+                    SortBy = sortBy,
+                    SortOrder = sortOrder
+                };
+                var list = await _adminService.ListOrganizationsAsync(uid.Value, filter);
                 return Ok(list);
             }
             catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))
@@ -82,13 +99,24 @@ namespace Bank.API.Controllers
         }
 
         [HttpGet("accounts")]
-        public async Task<IActionResult> Accounts()
+        public async Task<IActionResult> Accounts([FromQuery] string? currency, [FromQuery] string? accountType,
+            [FromQuery] string? status, [FromQuery] string? search, 
+            [FromQuery] string? sortBy, [FromQuery] string? sortOrder)
         {
             var uid = CurrentUserId;
             if (uid == null) return Unauthorized();
             try
             {
-                var list = await _adminService.ListAccountsAsync(uid.Value);
+                var filter = new AdminAccountFilterRequest
+                {
+                    Currency = currency,
+                    AccountType = accountType,
+                    Status = status,
+                    Search = search,
+                    SortBy = sortBy,
+                    SortOrder = sortOrder
+                };
+                var list = await _adminService.ListAccountsAsync(uid.Value, filter);
                 return Ok(list);
             }
             catch (BusinessException ex) when (ex.Message.Contains("Доступ только"))

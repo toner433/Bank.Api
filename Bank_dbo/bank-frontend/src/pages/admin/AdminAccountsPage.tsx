@@ -21,15 +21,47 @@ const AdminAccountsPage: React.FC = () => {
         isBlocked: false,
     });
 
-    const load = () =>
+    const [currency, setCurrency] = useState('all');
+    const [accountType, setAccountType] = useState('all');
+    const [status, setStatus] = useState('all');
+    const [search, setSearch] = useState('');
+
+    const [sortBy, setSortBy] = useState('createdAt');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+    const load = () => {
+        setErr('');
         adminApi
-            .accounts()
+            .accounts({ currency, accountType, status, search, sortBy, sortOrder })
             .then((r) => setRows(r.data as any[]))
             .catch((e) => setErr(e.response?.data?.error || 'Ошибка'));
+    };
 
     useEffect(() => {
         load();
-    }, []);
+    }, [currency, accountType, status, sortBy, sortOrder]);
+
+    const handleSearch = () => {
+        load();
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') handleSearch();
+    };
+
+    const toggleSort = (field: string) => {
+        if (sortBy === field) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(field);
+            setSortOrder('desc');
+        }
+    };
+
+    const getSortIcon = (field: string) => {
+        if (sortBy !== field) return null;
+        return sortOrder === 'asc' ? ' ↑' : ' ↓';
+    };
 
     const startEdit = (a: any) => {
         setEditingId(a.id);
@@ -68,6 +100,81 @@ const AdminAccountsPage: React.FC = () => {
     return (
         <div>
             {err && <div className="alert alert-danger">{err}</div>}
+
+            <div className="card mb-3" style={{ padding: '1rem' }}>
+                <div className="row" style={{ gap: '0.5rem 0', alignItems: 'flex-end' }}>
+                    <div className="col-md-2">
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Валюта</label>
+                            <select 
+                                className="form-input" 
+                                value={currency} 
+                                onChange={(e) => setCurrency(e.target.value)}
+                            >
+                                <option value="all">Все</option>
+                                <option value="BYN">BYN</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="RUB">RUB</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Тип счёта</label>
+                            <select 
+                                className="form-input" 
+                                value={accountType} 
+                                onChange={(e) => setAccountType(e.target.value)}
+                            >
+                                <option value="all">Все</option>
+                                <option value="Debit">Дебетовый</option>
+                                <option value="corporate_current">Корпоративный текущий</option>
+                                <option value="time_deposit">Срочный вклад</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="col-md-2">
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Статус</label>
+                            <select 
+                                className="form-input" 
+                                value={status} 
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                <option value="all">Все</option>
+                                <option value="active">Активные</option>
+                                <option value="blocked">Заблокированные</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Поиск</label>
+                            <input
+                                className="form-input"
+                                type="text"
+                                placeholder="Номер счёта или владелец"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                            />
+                        </div>
+                    </div>
+                    <div className="col-md-2 d-flex gap-2" style={{ marginBottom: 0, paddingTop: '1.5rem' }}>
+                        <button type="button" className="btn btn--sm" onClick={handleSearch}>
+                            Найти
+                        </button>
+                        <button 
+                            type="button" 
+                            className="btn btn--sm btn-outline-secondary"
+                            onClick={() => { setCurrency('all'); setAccountType('all'); setStatus('all'); setSearch(''); setSortBy('createdAt'); setSortOrder('desc'); }}
+                        >
+                            Сбросить
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             {editingId && (
                 <div className="card mb-4" style={{ padding: '1.5rem' }}>
@@ -156,12 +263,19 @@ const AdminAccountsPage: React.FC = () => {
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th>Номер</th>
+                            <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('accountNumber')}>
+                                Номер{getSortIcon('accountNumber')}
+                            </th>
                             <th>Владелец</th>
-                            <th>Баланс</th>
+                            <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('balance')}>
+                                Баланс{getSortIcon('balance')}
+                            </th>
                             <th>Тип</th>
                             <th>Статус</th>
                             <th>Комментарий</th>
+                            <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('createdAt')}>
+                                Создан{getSortIcon('createdAt')}
+                            </th>
                             <th />
                         </tr>
                     </thead>
@@ -178,6 +292,7 @@ const AdminAccountsPage: React.FC = () => {
                                         : <span className="badge badge-success">ОК</span>}
                                 </td>
                                 <td>{a.adminComment || '—'}</td>
+                                <td>{new Date(a.createdAt).toLocaleDateString('ru-RU')}</td>
                                 <td>
                                     <button
                                         type="button"
@@ -191,6 +306,7 @@ const AdminAccountsPage: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
+                {rows.length === 0 && <p className="text-muted p-3 mb-0">Счета не найдены</p>}
             </div>
         </div>
     );

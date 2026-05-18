@@ -23,7 +23,7 @@ namespace Bank.Domain.Models
         public string? VatType { get; set; }
         public decimal? VatAmount { get; set; }
         public string Purpose { get; set; } = string.Empty;
-        /// <summary>Draft, Signed, Executed, Cancelled</summary>
+       
         public string Status { get; set; } = "Draft";
         public string? SignatureValue { get; set; }
         public string? SignerCertificateThumbprint { get; set; }
